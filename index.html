@@ -3,10 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Schedina – Sblocco personalizzato & Verifica (combo support)</title>
+<title>Schedina – Sblocco personalizzato & Verifica (builder + DST fix)</title>
 <style>
   :root{
-    /* Pastelli giocosi */
     --bg:#fffdf8; --ink:#1f2230; --muted:#60657a; --card:#ffffff; --line:#ece6ff;
     --accent:#6c7bff; --accent-2:#ff7db3; --accent-3:#7be3c5; --accent-4:#ffd56c;
     --ok:#1e9e69; --bad:#d9415f; --warn:#b98400;
@@ -25,47 +24,33 @@
     font:16px/1.45 ui-rounded, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Inter, Arial;
     padding:24px; display:flex; align-items:center; justify-content:center;
   }
-  .wrap{width:100%; max-width:1100px; display:grid; gap:18px}
+  .wrap{width:100%; max-width:1120px; display:grid; gap:18px}
   header{display:flex; align-items:center; justify-content:space-between; gap:12px}
   h1{margin:0; font-size:26px; display:flex; align-items:center; gap:10px}
-  h1 .logo{
-    width:38px; height:38px; border-radius:12px; display:grid; place-items:center; font-size:20px;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2)); color:#fff; box-shadow:var(--shadow);
-  }
-  .pill{
-    background:#fff; border:2px dashed var(--accent); border-radius:999px; padding:8px 12px;
-    font-weight:800; font-size:12px; color:var(--accent); display:flex; align-items:center; gap:8px;
-  }
+  h1 .logo{width:38px; height:38px; border-radius:12px; display:grid; place-items:center; font-size:20px;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:#fff; box-shadow:var(--shadow)}
+  .pill{background:#fff; border:2px dashed var(--accent); border-radius:999px; padding:8px 12px;
+    font-weight:800; font-size:12px; color:var(--accent); display:flex; align-items:center; gap:8px}
   .grid{display:grid; gap:18px}
-  @media(min-width:950px){ .grid{grid-template-columns:1.05fr .95fr} }
-
-  .card{
-    background:var(--card); border:2px solid var(--line); border-radius:var(--r); padding:18px; box-shadow:var(--shadow); position:relative;
-  }
+  @media(min-width:950px){ .grid{grid-template-columns:1.1fr .9fr} }
+  .card{background:var(--card); border:2px solid var(--line); border-radius:var(--r); padding:18px; box-shadow:var(--shadow); position:relative}
   .card h2{margin:0 0 8px 0; font-size:19px; display:flex; align-items:center; gap:8px}
-  .sticker{
-    position:absolute; right:-8px; top:-10px; transform:rotate(6deg);
-    background:#fff; border:2px dashed var(--accent); color:var(--accent);
-    border-radius:12px; padding:6px 10px; font-size:12px; font-weight:900; box-shadow:var(--shadow);
-  }
+  .sticker{position:absolute; right:-8px; top:-10px; transform:rotate(6deg); background:#fff; border:2px dashed var(--accent); color:var(--accent);
+    border-radius:12px; padding:6px 10px; font-size:12px; font-weight:900; box-shadow:var(--shadow)}
   .muted{color:var(--muted); font-size:13px}
   .tag{font-size:12px; font-weight:700; color:#fff; background:linear-gradient(135deg,var(--accent-3),var(--accent-2)); border-radius:999px; padding:4px 10px}
 
   label{display:block; font-size:13px; color:var(--muted); margin:10px 0 6px}
-  input[type="text"], input[type="password"], input[type="date"], input[type="time"], textarea{
-    width:100%; background:#fff; color:var(--ink);
-    border:2px solid var(--line); border-radius:14px; padding:12px 14px; outline:none; transition:border-color .2s, box-shadow .2s; font-weight:600;
+  input[type="text"],input[type="password"],input[type="date"],input[type="time"],textarea,select{
+    width:100%; background:#fff; color:var(--ink); border:2px solid var(--line); border-radius:14px; padding:12px 14px;
+    outline:none; transition:border-color .2s, box-shadow .2s; font-weight:600
   }
-  input:focus, textarea:focus{ border-color:var(--accent); box-shadow:0 0 0 4px rgba(108,123,255,.12) }
+  input:focus,textarea:focus,select:focus{border-color:var(--accent); box-shadow:0 0 0 4px rgba(108,123,255,.12)}
   textarea{min-height:150px; resize:vertical}
   .row{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
-  .btn{
-    border:0; background:#1f2337; color:#fff; padding:12px 16px; border-radius:14px; cursor:pointer;
-    font-weight:800; letter-spacing:.2px; box-shadow:var(--shadow); transform:translateY(0);
-    transition:transform .06s ease, filter .2s ease, opacity .2s;
-  }
-  .btn:hover{filter:brightness(1.04)}
-  .btn:active{transform:translateY(1px)}
+  .btn{border:0; background:#1f2337; color:#fff; padding:12px 16px; border-radius:14px; cursor:pointer;
+    font-weight:800; letter-spacing:.2px; box-shadow:var(--shadow); transform:translateY(0); transition:transform .06s ease,filter .2s ease,opacity .2s}
+  .btn:hover{filter:brightness(1.04)} .btn:active{transform:translateY(1px)}
   .btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent-2))}
   .btn.good{background:linear-gradient(135deg,var(--accent-3),#3ac49b)}
   .btn.warn{background:linear-gradient(135deg,var(--accent-4),#ffae42); color:#3a2d00}
@@ -76,262 +61,321 @@
   .success{color:var(--ok); font-weight:800}
   .error{color:var(--bad); font-weight:800}
   .warnText{color:var(--warn); font-weight:800}
-  .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  .sep{height:1px; background:var(--line); margin:12px 0}
 
   .pretty-list{list-style:none; padding:0; margin:0}
-  .pretty-list li{
-    padding:8px 10px; margin:6px 0; background:#fff; border:2px solid var(--line); border-radius:12px; font-weight:700;
-    display:flex; align-items:center; gap:10px; justify-content:space-between;
-  }
+  .pretty-list li{padding:8px 10px; margin:6px 0; background:#fff; border:2px solid var(--line); border-radius:12px; font-weight:700;
+    display:flex; align-items:center; gap:10px; justify-content:space-between}
   .left{display:flex; align-items:center; gap:10px}
   .pretty-dot{width:12px; height:12px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent-2)); box-shadow:0 0 0 3px rgba(108,123,255,.18)}
   .badge{padding:2px 8px; border-radius:999px; font-size:12px; font-weight:800; border:2px dashed var(--line)}
   .badge.win{background:#eaffe9; color:#0b6a3f; border-color:#bdf1c6}
   .badge.lose{background:#ffe9ef; color:#8a1031; border-color:#ffc0d0}
+  .small{font-size:12px}
   .hl{background:#fff4b8; border-radius:6px; padding:1px 6px}
   .hl2{background:#ffd8ea; border-radius:6px; padding:1px 6px}
-  .small{font-size:12px}
-  .sep{height:1px; background:var(--line); margin:12px 0}
+
+  .builder{border:2px dashed var(--line); border-radius:14px; padding:12px; background:#fff}
+  .builder .row > div{min-width:140px}
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <h1><span class="logo">🎲</span> Schedina – <span style="font-weight:900; background:#fff; border-radius:10px; padding:2px 8px; border:2px dashed var(--line)">Sblocco personalizzato</span></h1>
-      <div class="pill" id="statePill">⚪ Stato: <b>Inizializzazione…</b></div>
-    </header>
+<div class="wrap">
+  <header>
+    <h1><span class="logo">🎲</span> Schedina – <span style="font-weight:900; background:#fff; border-radius:10px; padding:2px 8px; border:2px dashed var(--line)">Sblocco personalizzato</span></h1>
+    <div class="pill" id="statePill">⚪ Stato: <b>Inizializzazione…</b></div>
+  </header>
 
-    <div class="grid">
-      <!-- EDITOR -->
-      <section class="card" id="editorCard">
-        <div class="sticker">✍️ Editor</div>
-        <h2>✍️ Inserisci la schedina <span class="tag">si blocca alla tua data/ora</span></h2>
-        <p class="muted">
-          Salva con una <b>data/ora di sblocco</b> a tua scelta. Prima di quel momento non potrai vedere né modificare.
-          Dati cifrati in locale. Supporto a <b>pronostici combinati</b> (es. <span class="mono">X2 + Under 3.5</span>).
-        </p>
+  <div class="grid">
+    <!-- EDITOR -->
+    <section class="card" id="editorCard">
+      <div class="sticker">✍️ Editor</div>
+      <h2>✍️ Inserisci la schedina <span class="tag">si blocca alla tua data/ora</span></h2>
+      <p class="muted">Puoi scrivere a mano oppure usare il <b>builder</b> con i menù a tendina.</p>
 
-        <label for="title">Titolo/Etichetta</label>
-        <input id="title" type="text" placeholder="Schedina Turno 34 – Super combo">
+      <!-- BUILDER -->
+      <div class="builder">
+        <div class="row">
+          <div style="flex:1;min-width:170px">
+            <label>Squadra Casa</label>
+            <input id="bHome" type="text" placeholder="Frosinone">
+          </div>
+          <div style="flex:1;min-width:170px">
+            <label>Squadra Ospite</label>
+            <input id="bAway" type="text" placeholder="Cesena">
+          </div>
+          <div style="min-width:160px">
+            <label>Tipo pronostico</label>
+            <select id="bType">
+              <option value="1X2">1X2</option>
+              <option value="DC">Doppia Chance</option>
+              <option value="OU">Over/Under</option>
+              <option value="BTTS">GG/NG</option>
+              <option value="COMBO">Combo</option>
+            </select>
+          </div>
+        </div>
+        <div class="row" id="bOpts1">
+          <!-- 1X2 -->
+          <div data-for="1X2"><label>Scelta</label><select id="b1x2"><option>1</option><option>X</option><option>2</option></select></div>
+          <!-- DC -->
+          <div data-for="DC" style="display:none"><label>Scelta</label><select id="bDc"><option>1X</option><option>X2</option><option>12</option></select></div>
+          <!-- OU -->
+          <div data-for="OU" style="display:none">
+            <label>Over/Under</label><select id="bOuPick"><option>Over</option><option>Under</option></select>
+          </div>
+          <div data-for="OU" style="display:none">
+            <label>Soglia</label><input id="bOuThr" type="text" placeholder="0.5 | 1.5 | 2.5">
+          </div>
+          <!-- BTTS -->
+          <div data-for="BTTS" style="display:none"><label>Scelta</label><select id="bBtts"><option value="GG">GG (Goal)</option><option value="NG">NG (NoGoal)</option></select></div>
+          <!-- COMBO -->
+          <div data-for="COMBO" style="display:none;flex:1">
+            <label>Combo (aggiungi pezzi)</label>
+            <div class="row">
+              <select id="cType">
+                <option value="1X2">1X2</option>
+                <option value="DC">Doppia Chance</option>
+                <option value="OU">Over/Under</option>
+                <option value="BTTS">GG/NG</option>
+              </select>
+              <input id="cParam1" type="text" placeholder="(1 / X / 2) o Over/Under">
+              <input id="cParam2" type="text" placeholder="soglia (es. 2.5)">
+              <button class="btn ghost" id="cAdd">+ Aggiungi pezzo</button>
+            </div>
+            <div class="small muted" id="cPreview">Nessun pezzo aggiunto.</div>
+          </div>
+        </div>
+        <div class="row" style="margin-top:8px">
+          <button class="btn good" id="bAddLine">➕ Aggiungi riga nel box</button>
+          <span class="muted small">Formato auto: <span class="mono">Casa – Ospite …</span></span>
+        </div>
+      </div>
 
-        <label for="content">Contenuto (una riga per voce)</label>
-        <textarea id="content" placeholder="Esempi:
-Napoli – Pisa 1
+      <label for="title">Titolo/Etichetta</label>
+      <input id="title" type="text" placeholder="Schedina Turno 34 – Super combo">
+
+      <label for="content">Contenuto (una riga per voce)</label>
+      <textarea id="content" placeholder="Napoli – Pisa 1
 Parma – Torino X2
 Ath. Bilbao – Girona Over 2.5
 Roma – Lazio GG
-Milan – Lecce 1 + Over 2.5
-Valencia – Oviedo 1X2:1 + U/O 3.5:O"></textarea>
+Milan – Lecce 1 + Over .5"></textarea>
 
-        <div class="row">
-          <div style="flex:1; min-width:240px">
-            <label for="pass">Passphrase (per cifrare/decifrare)</label>
-            <input id="pass" type="password" placeholder="La tua chiave segreta">
-          </div>
-          <div style="width:180px">
-            <label for="tag">Tag</label>
-            <input id="tag" type="text" placeholder="Settimana 38">
-          </div>
+      <div class="row">
+        <div style="flex:1; min-width:240px">
+          <label for="pass">Passphrase (per cifrare/decifrare)</label>
+          <input id="pass" type="password" placeholder="La tua chiave segreta">
+        </div>
+        <div style="width:180px">
+          <label for="tag">Tag</label>
+          <input id="tag" type="text" placeholder="Settimana 38">
+        </div>
+      </div>
+
+      <div class="row">
+        <div style="width:180px"><label for="unlockDate">Data sblocco</label><input id="unlockDate" type="date"></div>
+        <div style="width:140px"><label for="unlockTime">Ora sblocco</label><input id="unlockTime" type="time" step="60"></div>
+        <div class="small muted">Zona oraria: <b>Europe/Rome</b> (offset auto)</div>
+      </div>
+
+      <div class="row" style="margin-top:12px">
+        <button class="btn primary" id="saveBtn">💾 Salva & Blocca fino alla data scelta</button>
+        <button class="btn ghost" id="clearBtn" title="Rimuove tutto e sblocca">🗑️ Pulisci</button>
+        <span id="saveMsg" class="muted"></span>
+      </div>
+
+      <div id="editorLock" class="muted" style="margin-top:12px; display:none">
+        <span class="warnText">Editor bloccato.</span> Torna modificabile <span class="mono" id="lockUntilText">—</span>.
+      </div>
+    </section>
+
+    <!-- VIEWER / VERIFICA -->
+    <section class="card" id="viewerCard">
+      <div class="sticker" style="right:auto; left:-8px; transform:rotate(-6deg)">🔒 Visualizza</div>
+      <h2>🔒 Visualizza & Verifica esito</h2>
+
+      <div class="row" style="justify-content:space-between; align-items:flex-end">
+        <div>
+          <div class="muted">Stato sblocco</div>
+          <div id="unlockState" style="font-weight:900">verifica…</div>
+        </div>
+        <div class="row" style="gap:10px">
+          <div class="count" id="countdown">00:00:00:00</div>
+          <div class="muted small">gg : hh : mm : ss</div>
+        </div>
+      </div>
+      <div class="sep"></div>
+
+      <label for="viewPass">Passphrase (necessaria dopo lo sblocco)</label>
+      <input id="viewPass" type="password" placeholder="La stessa usata al salvataggio">
+
+      <div class="row" style="margin-top:12px">
+        <button class="btn good" id="viewBtn">🔓 Mostra schedina</button>
+        <button class="btn warn" id="resetWeekBtn" title="Dopo lo sblocco puoi ripartire pulito">🆕 Nuova settimana</button>
+        <span id="viewMsg" class="muted"></span>
+      </div>
+
+      <div id="result" class="card" style="margin-top:14px; background:#fffdfc; border-style:solid">
+        <div class="row" style="justify-content:space-between; gap:8px; flex-wrap:wrap">
+          <div><span class="muted">Titolo:</span> <b id="resTitle">—</b></div>
+          <div><span class="muted">Tag:</span> <b id="resTag">—</b></div>
         </div>
 
-        <div class="row">
-          <div style="width:180px">
-            <label for="unlockDate">Data sblocco</label>
-            <input id="unlockDate" type="date">
-          </div>
-          <div style="width:140px">
-            <label for="unlockTime">Ora sblocco</label>
-            <input id="unlockTime" type="time" step="60">
-          </div>
-          <div class="small muted">Zona oraria: <b>Europe/Rome</b></div>
-        </div>
-
-        <div class="row" style="margin-top:12px">
-          <button class="btn primary" id="saveBtn">💾 Salva & Blocca fino alla data scelta</button>
-          <button class="btn ghost" id="clearBtn" title="Rimuove tutto e sblocca">🗑️ Pulisci</button>
-          <span id="saveMsg" class="muted"></span>
-        </div>
-
-        <div id="editorLock" class="muted" style="margin-top:12px; display:none">
-          <span class="warnText">Editor bloccato.</span> Torna modificabile <span class="mono" id="lockUntilText">—</span>.
-        </div>
-      </section>
-
-      <!-- VIEWER / VERIFICA -->
-      <section class="card" id="viewerCard">
-        <div class="sticker" style="right:auto; left:-8px; transform:rotate(-6deg)">🔒 Visualizza</div>
-        <h2>🔒 Visualizza & Verifica esito</h2>
-
-        <div class="row" style="justify-content:space-between; align-items:flex-end">
-          <div>
-            <div class="muted">Stato sblocco</div>
-            <div id="unlockState" style="font-weight:900">verifica…</div>
-          </div>
-          <div class="row" style="gap:10px">
-            <div class="count" id="countdown">00:00:00:00</div>
-            <div class="muted small">gg : hh : mm : ss</div>
-          </div>
-        </div>
         <div class="sep"></div>
 
-        <label for="viewPass">Passphrase (necessaria dopo lo sblocco)</label>
-        <input id="viewPass" type="password" placeholder="La stessa usata al salvataggio">
+        <div id="resultsPanel" style="display:none">
+          <p class="muted">Inserisci i risultati finali per ogni partita (già preimpostati a <b>0-0</b>), poi premi <b>Valuta esito</b>.
+            Puoi incollare i risultati in blocco (uno per riga, es. <span class="mono">2-1</span>, <span class="mono">1:1</span>).</p>
 
-        <div class="row" style="margin-top:12px">
-          <button class="btn good" id="viewBtn">🔓 Mostra schedina</button>
-          <button class="btn warn" id="resetWeekBtn" title="Dopo lo sblocco puoi ripartire pulito">🆕 Nuova settimana</button>
-          <span id="viewMsg" class="muted"></span>
-        </div>
-
-        <div id="result" class="card" style="margin-top:14px; background:#fffdfc; border-style:solid">
-          <div class="row" style="justify-content:space-between; gap:8px; flex-wrap:wrap">
-            <div><span class="muted">Titolo:</span> <b id="resTitle">—</b></div>
-            <div><span class="muted">Tag:</span> <b id="resTag">—</b></div>
-          </div>
-
-          <div class="sep"></div>
-
-          <!-- PANNELLO RISULTATI -->
-          <div id="resultsPanel" style="display:none">
-            <p class="muted">
-              Inserisci i risultati finali per ogni partita, poi premi <b>Valuta esito</b>.
-              Puoi incollare i risultati in blocco (uno per riga, formati tipo <span class="mono">2-1</span>, <span class="mono">1:1</span>).
-            </p>
-            <div class="row" style="align-items:flex-start">
-              <button class="btn good" id="evaluateBtn">✅ Valuta esito</button>
-              <div>
-                <label for="bulkScores" class="small">Incolla risultati in blocco</label>
-                <textarea id="bulkScores" placeholder="2-1
+          <div class="row" style="align-items:flex-start">
+            <button class="btn good" id="evaluateBtn">✅ Valuta esito</button>
+            <div>
+              <label for="bulkScores" class="small">Incolla risultati in blocco</label>
+              <textarea id="bulkScores" placeholder="2-1
 1-1
 0-0" style="min-height:80px; width:260px"></textarea>
-              </div>
-              <button class="btn ghost" id="applyBulkBtn" title="Applica ai campi sotto nell'ordine">📥 Applica in ordine</button>
             </div>
-
-            <ul class="pretty-list" id="linesList">
-              <li class="muted" style="font-weight:600">Nessun dato da mostrare.</li>
-            </ul>
-
-            <div class="sep"></div>
-            <div id="summary" class="muted">—</div>
+            <button class="btn ghost" id="applyBulkBtn" title="Applica ai campi sotto nell'ordine">📥 Applica in ordine</button>
           </div>
-        </div>
 
-        <p class="muted" style="margin-top:10px">
-          Dati salvati localmente (<span class="mono">localStorage</span>) e cifrati (AES-GCM con PBKDF2). Zona oraria: Europe/Rome.
-        </p>
-      </section>
-    </div>
+          <ul class="pretty-list" id="linesList">
+            <li class="muted" style="font-weight:600">Nessun dato da mostrare.</li>
+          </ul>
+
+          <div class="sep"></div>
+          <div id="summary" class="muted">—</div>
+        </div>
+      </div>
+
+      <p class="muted" style="margin-top:10px">
+        Dati salvati localmente (<span class="mono">localStorage</span>) e cifrati (AES-GCM + PBKDF2). Zona oraria: Europe/Rome (con ora legale).
+      </p>
+    </section>
   </div>
+</div>
 
 <script>
-/* ====== Time helpers (Europe/Rome) ====== */
-function romeParts(date=new Date()){
-  const p = new Intl.DateTimeFormat('en-GB',{
-    timeZone:'Europe/Rome', weekday:'short', year:'numeric', month:'2-digit', day:'2-digit',
-    hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false
-  }).formatToParts(date);
-  const get=t=>p.find(x=>x.type===t)?.value;
-  return {weekday:get('weekday'), year:+get('year'), month:+get('month'), day:+get('day'),
-          hour:+get('hour'), minute:+get('minute'), second:+get('second')};
+/* ===== Time utils con offset reale Europe/Rome (DST safe) ===== */
+function getTZOffsetMinutes(timeZone, y,m,d,hh,mm){
+  const dtf = new Intl.DateTimeFormat('en-GB',{timeZone, timeZoneName:'shortOffset', year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false});
+  const parts = dtf.formatToParts(new Date(Date.UTC(y,m-1,d,hh,mm,0)));
+  const tzn = parts.find(p=>p.type==='timeZoneName')?.value || 'GMT+0';
+  const m2 = tzn.match(/GMT([+-]\d{1,2})(?::(\d{2}))?/i);
+  if(!m2) return 0;
+  const sign = m2[1].startsWith('-')?-1:1;
+  const h = Math.abs(parseInt(m2[1],10));
+  const mi = m2[2]? parseInt(m2[2],10) : 0;
+  return sign*(h*60+mi);
 }
-function romeISOFromDateTimeInputs(dateStr,timeStr){
-  const nowP = romeParts(new Date());
-  const [y,m,d] = dateStr ? dateStr.split('-').map(n=>+n) : [nowP.year, nowP.month, nowP.day];
-  let hh=21, mm=0;
-  if(timeStr){ const [hS, mS] = timeStr.split(':'); hh=+hS; mm=+mS; }
-  const baseUTC = Date.UTC(y, m-1, d, 0, 0, 0);
-  const iso = new Date(baseUTC + (hh-1)*3600*1000 + mm*60*1000).toISOString(); // ~21:00 Rome ≈ 20:00 UTC
-  return iso;
+function makeISOInTZ(dateStr,timeStr,tz='Europe/Rome'){
+  const [y,m,d] = dateStr.split('-').map(n=>+n); 
+  let [hh,mm] = (timeStr||'21:00').split(':').map(n=>+n);
+  const off = getTZOffsetMinutes(tz,y,m,d,hh,mm);
+  const utcMs = Date.UTC(y,m-1,d,hh,mm,0) - off*60*1000; // local - offset = UTC
+  return new Date(utcMs).toISOString();
 }
 function msUntilISO(iso){
-  const tgt = new Date(iso);
-  const pr = romeParts(new Date());
-  const approxNowUTC = Date.UTC(pr.year, pr.month-1, pr.day, pr.hour-1, pr.minute, pr.second);
-  return tgt.getTime() - approxNowUTC;
+  const target = new Date(iso).getTime();
+  const now = Date.now();
+  return target - now;
 }
-function fmtCountdown(ms){
-  if(ms<0) ms=0;
-  const s=Math.floor(ms/1000), d=Math.floor(s/86400), h=Math.floor((s%86400)/3600), m=Math.floor((s%3600)/60), sec=s%60;
-  const pad=n=>String(n).padStart(2,'0'); return `${pad(d)}:${pad(h)}:${pad(m)}:${pad(sec)}`;
-}
+function fmtCountdown(ms){ if(ms<0) ms=0; const s=Math.floor(ms/1000), d=Math.floor(s/86400), h=Math.floor((s%86400)/3600), m=Math.floor((s%3600)/60), sec=s%60;
+  const pad=n=>String(n).padStart(2,'0'); return `${pad(d)}:${pad(h)}:${pad(m)}:${pad(sec)}`; }
 
-/* ====== Storage ====== */
-const KEY_DATA='schedina.pkg';    // cifrato
-const KEY_META='schedina.meta';   // { lockedUntilISO }
+/* ===== Storage & Crypto ===== */
+const KEY_DATA='schedina.pkg', KEY_META='schedina.meta'; 
 function saveMeta(meta){ localStorage.setItem(KEY_META, JSON.stringify(meta)); }
 function loadMeta(){ try{return JSON.parse(localStorage.getItem(KEY_META)||'null')}catch{return null} }
 function clearAll(){ localStorage.removeItem(KEY_DATA); localStorage.removeItem(KEY_META); }
 function hasSaved(){ return !!localStorage.getItem(KEY_DATA); }
 
-/* ====== Crypto (PBKDF2 + AES-GCM) ====== */
 function b64(buf){ return btoa(String.fromCharCode(...new Uint8Array(buf))); }
 function fromB64(b){ return Uint8Array.from(atob(b), c=>c.charCodeAt(0)); }
-async function deriveKey(pass, salt){
+async function deriveKey(pass,salt){
   const enc=new TextEncoder();
-  const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(pass), {name:'PBKDF2'}, false, ['deriveKey']);
-  return crypto.subtle.deriveKey(
-    {name:'PBKDF2', salt, iterations:120000, hash:'SHA-256'},
-    keyMaterial, {name:'AES-GCM', length:256}, false, ['encrypt','decrypt']
-  );
+  const mat=await crypto.subtle.importKey('raw',enc.encode(pass),{name:'PBKDF2'},false,['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:120000,hash:'SHA-256'}, mat,{name:'AES-GCM',length:256}, false, ['encrypt','decrypt']);
 }
-async function encryptJSON(obj, pass){
-  const enc=new TextEncoder();
-  const iv=crypto.getRandomValues(new Uint8Array(12));
-  const salt=crypto.getRandomValues(new Uint8Array(16));
-  const key=await deriveKey(pass, salt);
-  const data=enc.encode(JSON.stringify(obj));
-  const ct = await crypto.subtle.encrypt({name:'AES-GCM', iv}, key, data);
-  return {v:1, iv:b64(iv), salt:b64(salt), ct:b64(ct)};
+async function encryptJSON(obj,pass){
+  const enc=new TextEncoder(); const iv=crypto.getRandomValues(new Uint8Array(12)); const salt=crypto.getRandomValues(new Uint8Array(16));
+  const key=await deriveKey(pass,salt); const data=enc.encode(JSON.stringify(obj));
+  const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,data);
+  return {v:1,iv:b64(iv),salt:b64(salt),ct:b64(ct)};
 }
-async function decryptJSON(pkg, pass){
+async function decryptJSON(pkg,pass){
   const iv=fromB64(pkg.iv), salt=fromB64(pkg.salt), ct=fromB64(pkg.ct);
-  const key=await deriveKey(pass, salt);
-  const pt = await crypto.subtle.decrypt({name:'AES-GCM', iv}, key, ct);
+  const key=await deriveKey(pass,salt);
+  const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv},key,ct);
   return JSON.parse(new TextDecoder().decode(pt));
 }
 
-/* ====== UI Refs ====== */
+/* ===== UI refs ===== */
 const statePill=document.getElementById('statePill');
+const saveBtn=document.getElementById('saveBtn'), clearBtn=document.getElementById('clearBtn');
+const saveMsg=document.getElementById('saveMsg'), editorLock=document.getElementById('editorLock'), lockUntilText=document.getElementById('lockUntilText');
+const titleEl=document.getElementById('title'), contentEl=document.getElementById('content'), passEl=document.getElementById('pass'), tagEl=document.getElementById('tag');
+const unlockDateEl=document.getElementById('unlockDate'), unlockTimeEl=document.getElementById('unlockTime');
 
-const editorCard=document.getElementById('editorCard');
-const editorLock=document.getElementById('editorLock');
-const lockUntilText=document.getElementById('lockUntilText');
-const saveBtn=document.getElementById('saveBtn');
-const clearBtn=document.getElementById('clearBtn');
-const saveMsg=document.getElementById('saveMsg');
-const titleEl=document.getElementById('title');
-const contentEl=document.getElementById('content');
-const passEl=document.getElementById('pass');
-const tagEl=document.getElementById('tag');
-const unlockDateEl=document.getElementById('unlockDate');
-const unlockTimeEl=document.getElementById('unlockTime');
+const unlockState=document.getElementById('unlockState'), countdownEl=document.getElementById('countdown');
+const viewPassEl=document.getElementById('viewPass'), viewBtn=document.getElementById('viewBtn'), resetWeekBtn=document.getElementById('resetWeekBtn'), viewMsg=document.getElementById('viewMsg');
+const resTitle=document.getElementById('resTitle'), resTag=document.getElementById('resTag'), resultsPanel=document.getElementById('resultsPanel'), linesList=document.getElementById('linesList'), summary=document.getElementById('summary');
+const evaluateBtn=document.getElementById('evaluateBtn'), bulkScores=document.getElementById('bulkScores'), applyBulkBtn=document.getElementById('applyBulkBtn');
 
-const unlockState=document.getElementById('unlockState');
-const countdownEl=document.getElementById('countdown');
-const viewPassEl=document.getElementById('viewPass');
-const viewBtn=document.getElementById('viewBtn');
-const resetWeekBtn=document.getElementById('resetWeekBtn');
-const viewMsg=document.getElementById('viewMsg');
+/* ===== Builder refs ===== */
+const bHome=document.getElementById('bHome'), bAway=document.getElementById('bAway'), bType=document.getElementById('bType');
+const b1x2=document.getElementById('b1x2'), bDc=document.getElementById('bDc'), bOuPick=document.getElementById('bOuPick'), bOuThr=document.getElementById('bOuThr'), bBtts=document.getElementById('bBtts');
+const cType=document.getElementById('cType'), cParam1=document.getElementById('cParam1'), cParam2=document.getElementById('cParam2'), cAdd=document.getElementById('cAdd'), cPreview=document.getElementById('cPreview');
+const bAddLine=document.getElementById('bAddLine');
+let comboParts=[];
 
-const resTitle=document.getElementById('resTitle');
-const resTag=document.getElementById('resTag');
-const resultsPanel=document.getElementById('resultsPanel');
-const linesList=document.getElementById('linesList');
-const evaluateBtn=document.getElementById('evaluateBtn');
-const bulkScores=document.getElementById('bulkScores');
-const applyBulkBtn=document.getElementById('applyBulkBtn');
-const summary=document.getElementById('summary');
+bType.addEventListener('change', ()=>{
+  document.querySelectorAll('[data-for]').forEach(el=> el.style.display='none');
+  document.querySelectorAll(`[data-for="${bType.value}"]`).forEach(el=> el.style.display='block');
+});
+cAdd.addEventListener('click', (e)=>{
+  e.preventDefault();
+  const t=cType.value.trim();
+  const p1=cParam1.value.trim();
+  const p2=cParam2.value.trim();
+  let piece='';
+  if(t==='1X2' && /^(1|X|2)$/i.test(p1)) piece=`1X2:${p1.toUpperCase()}`;
+  else if(t==='DC' && /^(1X|X2|12)$/i.test(p1)) piece=p1.toUpperCase();
+  else if(t==='OU'){
+    const pick = /^(over|under|o|u)$/i.test(p1) ? (/^o$/i.test(p1)?'Over':/^u$/i.test(p1)?'Under':p1[0].toUpperCase()+p1.slice(1).toLowerCase()) : '';
+    const thr  = p2 || '2.5';
+    if(pick) piece = `${pick} ${thr}`;
+  } else if(t==='BTTS' && /^(gg|ng|goal|no\s*goal)$/i.test(p1)){
+    piece = (/gg|goal/i.test(p1))?'GG':'NG';
+  }
+  if(piece){ comboParts.push(piece); cPreview.textContent = comboParts.join(' + '); cParam1.value=''; cParam2.value=''; }
+});
+bAddLine.addEventListener('click',(e)=>{
+  e.preventDefault();
+  const home=bHome.value.trim(), away=bAway.value.trim();
+  if(!home || !away) return;
+  let market='';
+  if(bType.value==='1X2') market = b1x2.value;
+  if(bType.value==='DC')  market = bDc.value;
+  if(bType.value==='OU')  market = `${bOuPick.value} ${bOuThr.value||'2.5'}`;
+  if(bType.value==='BTTS')market = bBtts.value;
+  if(bType.value==='COMBO') market = comboParts.join(' + ');
+  if(!market){ return; }
+  const line = `${home} – ${away} ${market}`.trim();
+  contentEl.value = (contentEl.value? contentEl.value+'\n':'') + line;
+  if(bType.value==='COMBO') { comboParts=[]; cPreview.textContent='Nessun pezzo aggiunto.'; }
+});
 
-/* ====== Stato ====== */
-function setLockedUI(lockedUntilISO){
-  [titleEl, contentEl, passEl, tagEl, unlockDateEl, unlockTimeEl, saveBtn].forEach(el=>el.disabled=true);
+/* ===== Stato editor ===== */
+function setLockedUI(iso){
+  [titleEl,contentEl,passEl,tagEl,unlockDateEl,unlockTimeEl,saveBtn].forEach(el=>el.disabled=true);
   editorLock.style.display='block';
-  lockUntilText.textContent=new Intl.DateTimeFormat('it-IT',{timeZone:'Europe/Rome',weekday:'long',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).format(new Date(lockedUntilISO));
+  lockUntilText.textContent=new Intl.DateTimeFormat('it-IT',{timeZone:'Europe/Rome',weekday:'long',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).format(new Date(iso));
   statePill.innerHTML='🟣 Stato: <b>Bloccato</b>';
 }
 function setUnlockedUI(){
-  [titleEl, contentEl, passEl, tagEl, unlockDateEl, unlockTimeEl, saveBtn].forEach(el=>el.disabled=false);
+  [titleEl,contentEl,passEl,tagEl,unlockDateEl,unlockTimeEl,saveBtn].forEach(el=>el.disabled=false);
   editorLock.style.display='none';
   statePill.innerHTML='🟢 Stato: <b>Sbloccato</b>';
 }
@@ -340,266 +384,152 @@ function refreshState(){
   if(!meta){ setUnlockedUI(); unlockState.innerHTML='🟡 In attesa di salvataggio'; countdownEl.textContent='00:00:00:00'; return; }
   setLockedUI(meta.lockedUntilISO);
 }
-
-/* ====== Tick countdown ====== */
 function tick(){
   const meta=loadMeta();
   if(!meta){ requestAnimationFrame(()=>setTimeout(tick,600)); return; }
   const remain=msUntilISO(meta.lockedUntilISO);
   countdownEl.textContent=fmtCountdown(remain);
-  if(remain<=0){ unlockState.innerHTML='<span class="success">✅ Sbloccato: puoi visualizzare</span>'; }
-  else { unlockState.innerHTML='🔒 Ancora bloccato fino alla data impostata'; }
+  unlockState.innerHTML = (remain<=0) ? '<span class="success">✅ Sbloccato: puoi visualizzare</span>' : '🔒 Ancora bloccato fino alla data impostata';
   requestAnimationFrame(()=>setTimeout(tick,500));
 }
 
-/* ====== Save / Clear ====== */
+/* ===== Save / Clear ===== */
 async function handleSave(){
   saveMsg.textContent='';
   const title=(titleEl.value||'').trim();
   const content=(contentEl.value||'').trim();
   const pass=(passEl.value||'').trim();
   const tag=(tagEl.value||'').trim();
-  const dateStr=unlockDateEl.value;
-  const timeStr=unlockTimeEl.value || '21:00';
-
-  if(!title || !content || !pass || !dateStr){
-    saveMsg.innerHTML='<span class="error">Compila titolo, contenuto, passphrase e data di sblocco.</span>';
-    return;
-  }
-  const lockedUntilISO=romeISOFromDateTimeInputs(dateStr,timeStr);
-  if(msUntilISO(lockedUntilISO)<=0){
-    saveMsg.innerHTML='<span class="error">La data/ora di sblocco deve essere nel futuro.</span>';
-    return;
-  }
+  const dateStr=unlockDateEl.value, timeStr=unlockTimeEl.value||'21:00';
+  if(!title || !content || !pass || !dateStr){ saveMsg.innerHTML='<span class="error">Compila titolo, contenuto, passphrase e data di sblocco.</span>'; return; }
+  const lockedUntilISO=makeISOInTZ(dateStr,timeStr,'Europe/Rome');
+  if(msUntilISO(lockedUntilISO)<=0){ saveMsg.innerHTML='<span class="error">La data/ora di sblocco deve essere nel futuro.</span>'; return; }
   try{
-    const pkg=await encryptJSON({title, content, tag, savedAt:new Date().toISOString()}, pass);
+    const pkg=await encryptJSON({title,content,tag,savedAt:new Date().toISOString()},pass);
     localStorage.setItem(KEY_DATA, JSON.stringify(pkg));
     saveMeta({lockedUntilISO});
     setLockedUI(lockedUntilISO);
     saveMsg.innerHTML='<span class="success">🎉 Salvato! Ora è bloccato fino alla tua data/ora.</span>';
     burst();
-  }catch(e){
-    console.error(e);
-    saveMsg.innerHTML='<span class="error">Errore nel salvataggio.</span>';
-  }
+  }catch{ saveMsg.innerHTML='<span class="error">Errore nel salvataggio.</span>'; }
 }
 function handleClear(){
   clearAll(); setUnlockedUI();
   saveMsg.innerHTML='<span class="success">Pulito tutto. Editor sbloccato.</span>';
-  resTitle.textContent='—'; resTag.textContent='—';
-  linesList.innerHTML='<li class="muted" style="font-weight:600">Nessun dato da mostrare.</li>';
-  resultsPanel.style.display='none';
-  summary.textContent='—';
-  unlockState.innerHTML='🟡 In attesa di salvataggio';
-  countdownEl.textContent='00:00:00:00';
+  resTitle.textContent='—'; resTag.textContent='—'; resultsPanel.style.display='none'; linesList.innerHTML='<li class="muted" style="font-weight:600">Nessun dato da mostrare.</li>'; summary.textContent='—';
+  unlockState.innerHTML='🟡 In attesa di salvataggio'; countdownEl.textContent='00:00:00:00';
 }
 function handleResetWeek(){
-  const meta=loadMeta();
-  if(!meta){ viewMsg.innerHTML='<span class="error">Non c’è nulla da resettare.</span>'; return; }
-  if(msUntilISO(meta.lockedUntilISO)>0){
-    viewMsg.innerHTML='<span class="error">Puoi azzerare solo dopo lo sblocco.</span>'; return;
-  }
-  handleClear();
-  viewMsg.innerHTML='<span class="success">Settimana azzerata. Puoi inserire una nuova schedina!</span>';
+  const meta=loadMeta(); if(!meta){ viewMsg.innerHTML='<span class="error">Non c’è nulla da resettare.</span>'; return; }
+  if(msUntilISO(meta.lockedUntilISO)>0){ viewMsg.innerHTML='<span class="error">Puoi azzerare solo dopo lo sblocco.</span>'; return; }
+  handleClear(); viewMsg.innerHTML='<span class="success">Settimana azzerata. Puoi inserire una nuova schedina!</span>';
 }
 
-/* ====== Parser pronostici (con COMBO) ======
-   Supporta (singoli):
-   - 1X2: "1", "X", "2" oppure "1X2:1"
-   - Doppia chance: "1X", "X2", "12"
-   - Over/Under: "Over 2.5", "Under 3.5", "O 2.5", "U 2.5", "U/O 3.5:O"
-   - BTTS: "GG", "BTTS", "GOAL"  |  "NG", "NO GOAL"
-   COMBO: qualsiasi combinazione separata da " + ", "&", ",", " e "
-          es: "X2 + Under 3.5", "1 + U/O 3.5:O", "GG & Over 2.5"
-*/
+/* ===== Parser con COMBO e OU “.5” ===== */
 const sepRegex = /\s*[-–—]\s*/;
 const comboSep = /\s*(?:\+|&|,|\be\b)\s*/i;
-
 function parseLine(raw){
   if(!raw) return null;
   const line = raw.trim().replace(/\s+/g,' ');
-  // estrai POTENZIALMENTE le squadre (parte non essenziale per la logica)
   let home='', away='';
   if(sepRegex.test(line)){
     const [lhs, rhs] = line.split(sepRegex);
-    // Proviamo a capire squadre togliendo le parti di mercato
-    const cleanedL = removeMarkets(lhs);
-    const cleanedR = removeMarkets(rhs);
-    home = cleanedL.trim();
-    away = cleanedR.trim();
+    home = removeMarkets(lhs).trim(); away = removeMarkets(rhs).trim();
   }
-
-  // Estrai mercati (singolo o multipli)
-  const markets = extractMarkets(line);
-  if(markets.length===0){
-    return {home, away, market:{type:'UNKNOWN', raw:line}, rawLine:raw};
-  }
-  if(markets.length===1){
-    return {home, away, market:markets[0], rawLine:raw};
-  }
-  return {home, away, market:{type:'COMBO', picks:markets}, rawLine:raw};
+  const mkts = extractMarkets(line);
+  if(mkts.length===0) return {home,away,market:{type:'UNKNOWN',raw:line},rawLine:raw};
+  return (mkts.length===1) ? {home,away,market:mkts[0],rawLine:raw} : {home,away,market:{type:'COMBO',picks:mkts},rawLine:raw};
 }
-
-// Rimuove match di mercati dal testo (utile per isolare nomi squadre)
-function removeMarkets(text){
-  let t = text;
-  // 1X2:val
-  t = t.replace(/\b1X2\s*:\s*([12X])\b/gi, ' ');
-  // DC
-  t = t.replace(/\b(1X|X2|12)\b/gi, ' ');
-  // 1/X/2 soli (parola singola)
-  t = t.replace(/\b([12X])\b/g, ' ');
-  // OU vari
-  t = t.replace(/\bU\/O\s*([0-9](?:\.[05])?)\s*:\s*(O|U)\b/gi, ' ');
-  t = t.replace(/\b([OU])\s*([0-9](?:\.[05])?)\b/gi, ' ');
-  t = t.replace(/\b(OVER|UNDER)\s*([0-9](?:\.[05])?)\b/gi, ' ');
-  // BTTS
-  t = t.replace(/\b(GG|BTTS|GOAL)\b/gi, ' ');
-  t = t.replace(/\b(NG|NO\s*GOAL)\b/gi, ' ');
-  // separatori combo
-  t = t.replace(comboSep, ' ');
-  return t;
+function removeMarkets(t){
+  let s=t;
+  s=s.replace(/\b1X2\s*:\s*([12X])\b/gi,' ');
+  s=s.replace(/\b(1X|X2|12)\b/gi,' ');
+  s=s.replace(/\b([12X])\b/g,' ');
+  s=s.replace(/\bU\/O\s*([0-9]*\.?[05])\s*:\s*(O|U)\b/gi,' ');
+  s=s.replace(/\b([OU])\s*([0-9]*\.?[05])\b/gi,' ');
+  s=s.replace(/\b(OVER|UNDER)\s*([0-9]*\.?[05])\b/gi,' ');
+  s=s.replace(/\b(GG|BTTS|GOAL|NG|NO\s*GOAL)\b/gi,' ');
+  s=s.replace(comboSep,' ');
+  return s;
 }
-
 function extractMarkets(text){
-  // Spezza su potenziali separatori di combinazione ma NON è obbligatorio:
-  // cerchiamo tutti i mercati sul testo completo, poi de-duplico.
   const parts = text.split(comboSep).map(s=>s.trim()).filter(Boolean);
-
-  const found = [];
-  const push = m => { if(m) found.push(m); };
-
-  for(const part of parts){
-    const m = extractSingleMarket(part);
-    if(m) push(m);
-  }
-
-  // Se non ha separatori ma c'erano più mercati in un'unica stringa, prova anche a “scannerizzare” l'intera riga
-  if(found.length===0){
-    const multi = scanAllMarkets(text);
-    multi.forEach(push);
-  }
-
-  // Deduplica casi come "GG" e "BTTS" assieme (equivalenti)
-  const key = m=>{
+  const found=[];
+  const push=m=>{ if(m) found.push(m); };
+  for(const p of parts){ const m=extractSingleMarket(p); if(m) push(m); }
+  if(found.length===0){ scanAllMarkets(text).forEach(push); }
+  const key=m=>{
     if(m.type==='OU') return `OU-${m.pick}-${m.threshold}`;
-    if(m.type==='1X2') return `1X2-${m.pick}`;
-    if(m.type==='DC')  return `DC-${m.pick}`;
+    if(m.type==='1X2')return `1X2-${m.pick}`;
+    if(m.type==='DC') return `DC-${m.pick}`;
     if(m.type==='BTTS')return `BTTS-${m.pick}`;
-    return 'UNKNOWN';
+    return 'UNK';
   };
-  const seen = new Set();
-  return found.filter(m=>{ const k=key(m); if(seen.has(k)) return false; seen.add(k); return true; });
+  const seen=new Set(); return found.filter(m=>{const k=key(m); if(seen.has(k))return false; seen.add(k); return true;});
 }
-
+function readThr(str){
+  // accetta "2.5", "3.5", ".5"
+  const m = String(str).match(/^([0-9]*\.?[0-9]+)$/);
+  if(!m) return NaN;
+  return parseFloat(m[1]);
+}
 function extractSingleMarket(t){
-  const T = t.toUpperCase();
+  const T=t.toUpperCase();
 
-  // 1) 1X2 con valore esplicito: "1X2:1"
-  let m = T.match(/\b1X2\s*:\s*([12X])\b/);
-  if(m) return {type:'1X2', pick:m[1]};
+  // 1X2 esplicito
+  let m=T.match(/\b1X2\s*:\s*([12X])\b/); if(m) return {type:'1X2',pick:m[1]};
+  // DC
+  m=T.match(/\b(1X|X2|12)\b/); if(m) return {type:'DC',pick:m[1]};
+  // 1/X/2 singolo se non c'è DC
+  if(!/\b(1X|X2|12)\b/.test(T)){ m=T.match(/\b([12X])\b/); if(m) return {type:'1X2',pick:m[1]}; }
 
-  // 2) DC
-  m = T.match(/\b(1X|X2|12)\b/);
-  if(m) return {type:'DC', pick:m[1]};
+  // U/O thr:O|U   (thr può essere ".5")
+  m=T.match(/\bU\/O\s*([0-9]*\.?[0-9]+)\s*:\s*(O|U)\b/);
+  if(m){ const thr=readThr(m[1]); const pick=m[2]==='O'?'OVER':'UNDER'; if(!isNaN(thr)) return {type:'OU',pick,threshold:thr}; }
 
-  // 3) 1/X/2 singolo (evita di catturare se c'è anche DC nella stessa porzione)
-  // Se è presente una DC in 't', evitiamo 1X2 singolo per non duplicare.
-  if(!/\b(1X|X2|12)\b/.test(T)){
-    m = T.match(/\b([12X])\b/);
-    if(m) return {type:'1X2', pick:m[1]};
-  }
+  // O thr / U thr (thr può essere ".5")
+  m=T.match(/\b([OU])\s*([0-9]*\.?[0-9]+)\b/);
+  if(m){ const thr=readThr(m[2]); const pick=m[1]==='O'?'OVER':'UNDER'; if(!isNaN(thr)) return {type:'OU',pick,threshold:thr}; }
 
-  // 4) OU vari
-  m = T.match(/\bU\/O\s*([0-9](?:\.[05])?)\s*:\s*(O|U)\b/);
-  if(m){ const thr=parseFloat(m[1]); const pick=m[2]==='O'?'OVER':'UNDER'; return {type:'OU', pick, threshold:thr}; }
+  // Over/Under classico (accetta ".5")
+  m=T.match(/\b(OVER|UNDER)\s*([0-9]*\.?[0-9]+)\b/);
+  if(m){ const thr=readThr(m[2]); const pick=m[1]; if(!isNaN(thr)) return {type:'OU',pick,threshold:thr}; }
 
-  m = T.match(/\b([OU])\s*([0-9](?:\.[05])?)\b/);
-  if(m){ const thr=parseFloat(m[2]); const pick=m[1]==='O'?'OVER':'UNDER'; return {type:'OU', pick, threshold:thr}; }
-
-  m = T.match(/\b(OVER|UNDER)\s*([0-9](?:\.[05])?)\b/);
-  if(m){ const thr=parseFloat(m[2]); const pick=m[1]; return {type:'OU', pick, threshold:thr}; }
-
-  // 5) BTTS
-  m = T.match(/\b(GG|BTTS|GOAL)\b/);
-  if(m) return {type:'BTTS', pick:'GG'};
-  m = T.match(/\b(NG|NO\s*GOAL)\b/);
-  if(m) return {type:'BTTS', pick:'NG'};
+  // BTTS
+  m=T.match(/\b(GG|BTTS|GOAL)\b/); if(m) return {type:'BTTS',pick:'GG'};
+  m=T.match(/\b(NG|NO\s*GOAL)\b/); if(m) return {type:'BTTS',pick:'NG'};
 
   return null;
 }
-
-// Scanner globale se i separatori non ci sono ma i mercati sono concatenati
 function scanAllMarkets(text){
-  const T = text.toUpperCase();
-  const arr = [];
-
-  // ordine: DC -> 1X2:val -> OU -> BTTS -> 1X2 (singolo)
-  let m;
-  // DC (tutti)
-  const dcRe = /\b(1X|X2|12)\b/g; while((m=dcRe.exec(T))!==null){ arr.push({type:'DC', pick:m[1]}); }
-  // 1X2:val
-  const x2val = /\b1X2\s*:\s*([12X])\b/g; while((m=x2val.exec(T))!==null){ arr.push({type:'1X2', pick:m[1]}); }
-  // U/O thr:O|U
-  const uoColon = /\bU\/O\s*([0-9](?:\.[05])?)\s*:\s*(O|U)\b/g;
-  while((m=uoColon.exec(T))!==null){ arr.push({type:'OU', pick:(m[2]==='O'?'OVER':'UNDER'), threshold:parseFloat(m[1])}); }
-  // O thr / U thr
-  const shortOU = /\b([OU])\s*([0-9](?:\.[05])?)\b/g;
-  while((m=shortOU.exec(T))!==null){ arr.push({type:'OU', pick:(m[1]==='O'?'OVER':'UNDER'), threshold:parseFloat(m[2])}); }
-  // Over thr / Under thr
-  const longOU = /\b(OVER|UNDER)\s*([0-9](?:\.[05])?)\b/g;
-  while((m=longOU.exec(T))!==null){ arr.push({type:'OU', pick:m[1], threshold:parseFloat(m[2])}); }
-  // BTTS GG/NG
-  const ggRe = /\b(GG|BTTS|GOAL)\b/g; while((m=ggRe.exec(T))!==null){ arr.push({type:'BTTS', pick:'GG'}); }
-  const ngRe = /\b(NG|NO\s*GOAL)\b/g; while((m=ngRe.exec(T))!==null){ arr.push({type:'BTTS', pick:'NG'}); }
-  // 1X2 singolo (solo se non presente DC per evitare conflitti)
-  if(!/\b(1X|X2|12)\b/.test(T)){
-    const single = /\b([12X])\b/g;
-    while((m=single.exec(T))!==null){ arr.push({type:'1X2', pick:m[1]}); }
-  }
-  // deduplica dopo (lo fa extractMarkets)
+  const T=text.toUpperCase(); const arr=[]; let m;
+  const dcRe=/\b(1X|X2|12)\b/g; while((m=dcRe.exec(T))!==null){ arr.push({type:'DC',pick:m[1]}); }
+  const x2v=/\b1X2\s*:\s*([12X])\b/g; while((m=x2v.exec(T))!==null){ arr.push({type:'1X2',pick:m[1]}); }
+  const uoC=/\bU\/O\s*([0-9]*\.?[0-9]+)\s*:\s*(O|U)\b/g; while((m=uoC.exec(T))!==null){ arr.push({type:'OU',pick:(m[2]==='O'?'OVER':'UNDER'),threshold:readThr(m[1])}); }
+  const shortOU=/\b([OU])\s*([0-9]*\.?[0-9]+)\b/g; while((m=shortOU.exec(T))!==null){ arr.push({type:'OU',pick:(m[1]==='O'?'OVER':'UNDER'),threshold:readThr(m[2])}); }
+  const longOU=/\b(OVER|UNDER)\s*([0-9]*\.?[0-9]+)\b/g; while((m=longOU.exec(T))!==null){ arr.push({type:'OU',pick:m[1],threshold:readThr(m[2])}); }
+  const gg=/\b(GG|BTTS|GOAL)\b/g; while((m=gg.exec(T))!==null){ arr.push({type:'BTTS',pick:'GG'}); }
+  const ng=/\b(NG|NO\s*GOAL)\b/g; while((m=ng.exec(T))!==null){ arr.push({type:'BTTS',pick:'NG'}); }
+  if(!/\b(1X|X2|12)\b/.test(T)){ const single=/\b([12X])\b/g; while((m=single.exec(T))!==null){ arr.push({type:'1X2',pick:m[1]}); } }
   return arr;
 }
 
-/* ====== Valutazione ====== */
-function evaluateSingle(market, homeG, awayG){
-  const h = Number(homeG), a = Number(awayG);
-  if(!Number.isFinite(h)||!Number.isFinite(a)||h<0||a<0) return {ok:false, reason:'score_invalid'};
-  const tot = h+a;
-
-  switch(market.type){
-    case '1X2': {
-      const res = h>a?'1':(h<a?'2':'X');
-      return {ok: res===market.pick};
-    }
-    case 'DC': {
-      const res = h>a?'1':(h<a?'2':'X');
-      return {ok: market.pick.includes(res)};
-    }
-    case 'OU': {
-      if(typeof market.threshold!=='number') return {ok:false, reason:'thr'};
-      if(market.pick==='OVER') return {ok: tot > market.threshold};
-      if(market.pick==='UNDER') return {ok: tot < market.threshold};
-      return {ok:false};
-    }
-    case 'BTTS': {
-      const both = (h>0 && a>0);
-      return {ok: market.pick==='GG' ? both : !both};
-    }
-    default: return {ok:false, reason:'unknown_market'};
+/* ===== Valutazione ===== */
+function evaluateSingle(m,hg,ag){
+  const h=Number(hg), a=Number(ag); if(!Number.isFinite(h)||!Number.isFinite(a)||h<0||a<0) return {ok:false};
+  const tot=h+a;
+  switch(m.type){
+    case '1X2':{ const r=h>a?'1':(h<a?'2':'X'); return {ok:r===m.pick}; }
+    case 'DC': { const r=h>a?'1':(h<a?'2':'X'); return {ok:m.pick.includes(r)}; }
+    case 'OU': { if(typeof m.threshold!=='number') return {ok:false}; return {ok: m.pick==='OVER' ? (tot>m.threshold) : (tot<m.threshold)}; }
+    case 'BTTS':{ const both=(h>0 && a>0); return {ok:m.pick==='GG'? both : !both}; }
+    default: return {ok:false};
   }
 }
-
-function evaluateMarket(market, h, a){
-  if(market.type==='COMBO'){
-    // tutte devono essere ok
-    const results = market.picks.map(p=>evaluateSingle(p, h, a));
-    return { ok: results.every(r=>r.ok), details: results };
-  }
-  return evaluateSingle(market, h, a);
+function evaluateMarket(m,h,a){
+  if(m.type==='COMBO'){ const rs=m.picks.map(p=>evaluateSingle(p,h,a)); return {ok:rs.every(x=>x.ok)}; }
+  return evaluateSingle(m,h,a);
 }
-
-/* ====== UI helper ====== */
 function renderMarket(m){
   if(m.type==='1X2') return `1X2: <span class="hl">${m.pick}</span>`;
   if(m.type==='DC')  return `Doppia Chance: <span class="hl">${m.pick}</span>`;
@@ -609,136 +539,85 @@ function renderMarket(m){
   return `<span class="warnText">Pronostico non riconosciuto</span>`;
 }
 
-/* ====== Results UI build ====== */
-function makeLineRow(idx, item){
-  const li=document.createElement('li');
-  const left=document.createElement('div'); left.className='left';
-  const dot=document.createElement('span'); dot.className='pretty-dot';
-  const label=document.createElement('div');
-  const teams = (item.home||item.away) ? `${item.home||'—'} vs ${item.away||'—'}` : 'Partita';
-  const marketTxt = renderMarket(item.market);
-  label.innerHTML = `<div><b>${teams}</b></div><div class="small muted">${marketTxt}</div>`;
-  left.appendChild(dot); left.appendChild(label);
-
-  const right=document.createElement('div');
-  // inputs punteggio
-  const hIn=document.createElement('input'); hIn.type='number'; hIn.min='0'; hIn.step='1'; hIn.placeholder='H'; hIn.style.width='64px';
-  const sep=document.createElement('span'); sep.className='mono muted'; sep.textContent=' - ';
-  const aIn=document.createElement('input'); aIn.type='number'; aIn.min='0'; aIn.step='1'; aIn.placeholder='A'; aIn.style.width='64px';
-  const badge=document.createElement('span'); badge.className='badge'; badge.textContent='?'; badge.style.marginLeft='8px';
-
-  right.appendChild(hIn); right.appendChild(sep); right.appendChild(aIn); right.appendChild(badge);
-
-  li.appendChild(left); li.appendChild(right);
-
-  return {li, hIn, aIn, badge};
-}
-
-/* ====== View flow ====== */
+/* ===== View flow ===== */
+let resultRows=[];
 async function handleView(){
   viewMsg.textContent='';
-  const meta=loadMeta();
-  if(!meta){ viewMsg.innerHTML='<span class="error">Nessuna schedina salvata.</span>'; return; }
+  const meta=loadMeta(); if(!meta){ viewMsg.innerHTML='<span class="error">Nessuna schedina salvata.</span>'; return; }
   if(msUntilISO(meta.lockedUntilISO)>0){ viewMsg.innerHTML='<span class="error">Disponibile solo dopo lo sblocco.</span>'; return; }
-  const pkgStr=localStorage.getItem(KEY_DATA);
-  if(!pkgStr){ viewMsg.innerHTML='<span class="error">Dati mancanti.</span>'; return; }
-  const pass=(viewPassEl.value||'').trim();
-  if(!pass){ viewMsg.innerHTML='<span class="error">Inserisci la passphrase.</span>'; return; }
-
+  const pkgStr=localStorage.getItem(KEY_DATA); if(!pkgStr){ viewMsg.innerHTML='<span class="error">Dati mancanti.</span>'; return; }
+  const pass=(viewPassEl.value||'').trim(); if(!pass){ viewMsg.innerHTML='<span class="error">Inserisci la passphrase.</span>'; return; }
   try{
-    const data = await decryptJSON(JSON.parse(pkgStr), pass);
-    // Header
+    const data=await decryptJSON(JSON.parse(pkgStr),pass);
     resTitle.textContent=data.title||'—'; resTag.textContent=data.tag||'—';
-
-    // Parse lines
     const lines=(data.content||'').split('\n').map(s=>s.trim()).filter(Boolean);
-    const parsed = lines.map(parseLine);
-
-    // Build list
-    linesList.innerHTML='';
-    resultRows = []; // reset
-    parsed.forEach((item, idx)=>{
-      const {li, hIn, aIn, badge} = makeLineRow(idx, item||{market:{type:'UNKNOWN'}});
+    const parsed=lines.map(parseLine);
+    linesList.innerHTML=''; resultRows=[];
+    parsed.forEach((item)=>{
+      const li=document.createElement('li');
+      const left=document.createElement('div'); left.className='left';
+      const dot=document.createElement('span'); dot.className='pretty-dot';
+      const label=document.createElement('div');
+      const teams = (item.home||item.away) ? `${item.home||'—'} vs ${item.away||'—'}` : 'Partita';
+      label.innerHTML = `<div><b>${teams}</b></div><div class="small muted">${renderMarket(item.market)}</div>`;
+      left.appendChild(dot); left.appendChild(label);
+      const right=document.createElement('div');
+      const hIn=document.createElement('input'); hIn.type='number'; hIn.min='0'; hIn.step='1'; hIn.value='0'; hIn.style.width='64px';
+      const sep=document.createElement('span'); sep.className='mono muted'; sep.textContent=' - ';
+      const aIn=document.createElement('input'); aIn.type='number'; aIn.min='0'; aIn.step='1'; aIn.value='0'; aIn.style.width='64px';
+      const badge=document.createElement('span'); badge.className='badge'; badge.textContent='?'; badge.style.marginLeft='8px';
+      right.appendChild(hIn); right.appendChild(sep); right.appendChild(aIn); right.appendChild(badge);
+      li.appendChild(left); li.appendChild(right);
       linesList.appendChild(li);
-      resultRows.push({parsed:item, hIn, aIn, badge});
+      resultRows.push({parsed:item,hIn,aIn,badge});
     });
-
     resultsPanel.style.display='block';
     viewMsg.innerHTML='<span class="success">Schedina caricata ✔</span>';
-  }catch(e){
-    console.error(e);
-    viewMsg.innerHTML='<span class="error">Passphrase errata o dati corrotti.</span>';
-  }
+  }catch{ viewMsg.innerHTML='<span class="error">Passphrase errata o dati corrotti.</span>'; }
 }
-
-/* ====== Apply bulk scores ====== */
 function applyBulk(){
-  const rows = (bulkScores.value||'').split('\n').map(s=>s.trim()).filter(Boolean);
+  const rows=(bulkScores.value||'').split('\n').map(s=>s.trim()).filter(Boolean);
   for(let i=0;i<rows.length && i<resultRows.length;i++){
-    const m = rows[i].match(/^(\d+)\s*[-:]\s*(\d+)$/);
+    const m=rows[i].match(/^(\d+)\s*[-:]\s*(\d+)$/);
     if(m){ resultRows[i].hIn.value=m[1]; resultRows[i].aIn.value=m[2]; }
   }
 }
-
-/* ====== Evaluate ====== */
-let resultRows=[]; // {parsed, hIn, aIn, badge}
 function doEvaluate(){
   if(resultRows.length===0){ summary.textContent='Nessuna riga da valutare.'; return; }
   let wins=0, total=0, unknown=0;
-
   resultRows.forEach(row=>{
     total++;
-    const item=row.parsed;
-    const h=row.hIn.value, a=row.aIn.value;
-    if(!item || !item.market || item.market.type==='UNKNOWN'){
-      row.badge.className='badge lose'; row.badge.textContent='?'; unknown++;
-      return;
-    }
-    const ex = evaluateMarket(item.market, h, a);
+    const item=row.parsed, h=row.hIn.value, a=row.aIn.value;
+    if(!item || !item.market || item.market.type==='UNKNOWN'){ row.badge.className='badge lose'; row.badge.textContent='?'; unknown++; return; }
+    const ex=evaluateMarket(item.market,h,a);
     if(ex.ok){ row.badge.className='badge win'; row.badge.textContent='OK'; wins++; }
     else { row.badge.className='badge lose'; row.badge.textContent='KO'; }
   });
-
-  const allOk = (wins===total-unknown) && unknown===0 && total>0;
-  summary.innerHTML = allOk
-    ? `🏆 <b>Schedina VINCENTE</b> – ${wins}/${total} corretti`
-    : `ℹ️ Esito: ${wins}/${total} corretti` + (unknown? ` (⚠️ ${unknown} non riconosciuti)`:'');
+  const allOk=(wins===total-unknown)&&unknown===0&&total>0;
+  summary.innerHTML = allOk ? `🏆 <b>Schedina VINCENTE</b> – ${wins}/${total} corretti`
+                            : `ℹ️ Esito: ${wins}/${total} corretti` + (unknown? ` (⚠️ ${unknown} non riconosciuti)`:'');
 }
 
-/* ====== Confetti ====== */
+/* ===== Confetti & Init ===== */
 function burst(){
-  const emojis=['✨','🎉','💥','🎊','🌟']; const n=14;
-  for(let i=0;i<n;i++){
-    const s=document.createElement('div');
-    s.textContent=emojis[Math.floor(Math.random()*emojis.length)];
-    s.style.position='fixed';
-    s.style.left=(window.innerWidth/2+(Math.random()-0.5)*240)+'px';
-    s.style.top=(window.innerHeight/2+(Math.random()-0.5)*80)+'px';
-    s.style.fontSize=(18+Math.random()*10)+'px';
-    s.style.transform=`rotate(${(Math.random()*40-20)}deg)`; s.style.opacity='1';
-    s.style.transition='transform 700ms ease-out, opacity 700ms ease-out';
-    document.body.appendChild(s);
-    requestAnimationFrame(()=>{
-      s.style.transform += ` translate(${(Math.random()-0.5)*160}px, ${60+Math.random()*120}px)`;
-      s.style.opacity='0';
-    });
+  const emojis=['✨','🎉','💥','🎊','🌟']; for(let i=0;i<14;i++){ const s=document.createElement('div');
+    s.textContent=emojis[Math.floor(Math.random()*emojis.length)]; s.style.position='fixed';
+    s.style.left=(window.innerWidth/2+(Math.random()-0.5)*240)+'px'; s.style.top=(window.innerHeight/2+(Math.random()-0.5)*80)+'px';
+    s.style.fontSize=(18+Math.random()*10)+'px'; s.style.transform=`rotate(${(Math.random()*40-20)}deg)`; s.style.opacity='1';
+    s.style.transition='transform 700ms ease-out, opacity 700ms ease-out'; document.body.appendChild(s);
+    requestAnimationFrame(()=>{ s.style.transform += ` translate(${(Math.random()-0.5)*160}px, ${60+Math.random()*120}px)`; s.style.opacity='0'; });
     setTimeout(()=>s.remove(),800);
   }
 }
-
-/* ====== Init ====== */
 function initDefaultsForUnlock(){
-  // Default: prossima Domenica 21:00
+  // Default: prossima domenica ore 21:00 Rome
   const now=new Date();
-  const pr=romeParts(now);
-  const baseUTC=Date.UTC(pr.year, pr.month-1, pr.day, 0,0,0);
-  const wd = new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Rome',weekday:'short'}).format(new Date(baseUTC));
-  const idx={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6}[wd];
-  let add=(7-idx)%7; if(add===0) add=7;
-  const nextYMD = new Date(baseUTC + add*24*3600*1000);
-  const y=nextYMD.getUTCFullYear(), m=String(nextYMD.getUTCMonth()+1).padStart(2,'0'), d=String(nextYMD.getUTCDate()).padStart(2,'0');
-  unlockDateEl.value = `${y}-${m}-${d}`;
-  unlockTimeEl.value = '21:00';
+  const wd=now.getDay(); // 0=dom
+  const add=(7 - wd) % 7 || 7;
+  const next=new Date(now.getFullYear(), now.getMonth(), now.getDate()+add);
+  const y=next.getFullYear(), m=String(next.getMonth()+1).padStart(2,'0'), d=String(next.getDate()).padStart(2,'0');
+  document.getElementById('unlockDate').value=`${y}-${m}-${d}`;
+  document.getElementById('unlockTime').value='21:00';
 }
 function init(){
   refreshState(); tick();
