@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Schedina – Sblocco personalizzato & Verifica</title>
+<title>Schedina – Sblocco personalizzato & Verifica (combo support)</title>
 <style>
   :root{
     /* Pastelli giocosi */
@@ -30,7 +30,7 @@
   h1{margin:0; font-size:26px; display:flex; align-items:center; gap:10px}
   h1 .logo{
     width:38px; height:38px; border-radius:12px; display:grid; place-items:center; font-size:20px;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2)); color:#fff; box-shadow: var(--shadow);
+    background: linear-gradient(135deg, var(--accent), var(--accent-2)); color:#fff; box-shadow:var(--shadow);
   }
   .pill{
     background:#fff; border:2px dashed var(--accent); border-radius:999px; padding:8px 12px;
@@ -106,17 +106,22 @@
       <section class="card" id="editorCard">
         <div class="sticker">✍️ Editor</div>
         <h2>✍️ Inserisci la schedina <span class="tag">si blocca alla tua data/ora</span></h2>
-        <p class="muted">Quando premi <b>Salva & Blocca</b> scegli il <b>giorno/ora di sblocco</b>. Prima di quel momento non potrai vedere né modificare. Dati cifrati in locale.</p>
+        <p class="muted">
+          Salva con una <b>data/ora di sblocco</b> a tua scelta. Prima di quel momento non potrai vedere né modificare.
+          Dati cifrati in locale. Supporto a <b>pronostici combinati</b> (es. <span class="mono">X2 + Under 3.5</span>).
+        </p>
 
         <label for="title">Titolo/Etichetta</label>
         <input id="title" type="text" placeholder="Schedina Turno 34 – Super combo">
 
-        <label for="content">Contenuto (una riga per voce). Esempi: <span class="small mono">“Milan – Lecce 1”</span>, <span class="small mono">“Bilbao–Girona Over 2.5”</span>, <span class="small mono">“Roma-Lazio GG”</span>, <span class="small mono">“Parma – Torino X2”</span>.</label>
-        <textarea id="content" placeholder="Napoli – Pisa 1
-Frosinone – Cagliari X
-Udinese – Palermo 1
-Milan – Lecce 1
-Ath. Bilbao – Girona Over 2.5"></textarea>
+        <label for="content">Contenuto (una riga per voce)</label>
+        <textarea id="content" placeholder="Esempi:
+Napoli – Pisa 1
+Parma – Torino X2
+Ath. Bilbao – Girona Over 2.5
+Roma – Lazio GG
+Milan – Lecce 1 + Over 2.5
+Valencia – Oviedo 1X2:1 + U/O 3.5:O"></textarea>
 
         <div class="row">
           <div style="flex:1; min-width:240px">
@@ -186,9 +191,12 @@ Ath. Bilbao – Girona Over 2.5"></textarea>
 
           <div class="sep"></div>
 
-          <!-- PANNELLO RISULTATI (si mostra dopo lo sblocco e la decifratura) -->
+          <!-- PANNELLO RISULTATI -->
           <div id="resultsPanel" style="display:none">
-            <p class="muted">Inserisci i risultati finali per ogni partita, poi premi <b>Valuta esito</b>. Puoi anche incollare i risultati in blocco (uno per riga, formati tipo <span class="mono">2-1</span>, <span class="mono">1:1</span>).</p>
+            <p class="muted">
+              Inserisci i risultati finali per ogni partita, poi premi <b>Valuta esito</b>.
+              Puoi incollare i risultati in blocco (uno per riga, formati tipo <span class="mono">2-1</span>, <span class="mono">1:1</span>).
+            </p>
             <div class="row" style="align-items:flex-start">
               <button class="btn good" id="evaluateBtn">✅ Valuta esito</button>
               <div>
@@ -228,18 +236,12 @@ function romeParts(date=new Date()){
           hour:+get('hour'), minute:+get('minute'), second:+get('second')};
 }
 function romeISOFromDateTimeInputs(dateStr,timeStr){
-  // costruisce una data Europe/Rome con i campi date+time forniti, restituisce ISO
   const nowP = romeParts(new Date());
   const [y,m,d] = dateStr ? dateStr.split('-').map(n=>+n) : [nowP.year, nowP.month, nowP.day];
   let hh=21, mm=0;
-  if(timeStr){
-    const [hS, mS] = timeStr.split(':');
-    hh = +hS; mm = +mS;
-  }
-  // Approssimazione robusta: "Rome 00:00" come UTC base
+  if(timeStr){ const [hS, mS] = timeStr.split(':'); hh=+hS; mm=+mS; }
   const baseUTC = Date.UTC(y, m-1, d, 0, 0, 0);
-  // 21:00 Rome ≈ 20:00 UTC (l'euristica si mantiene coerente con i nostri calcoli)
-  const iso = new Date(baseUTC + (hh-1)*3600*1000 + mm*60*1000).toISOString();
+  const iso = new Date(baseUTC + (hh-1)*3600*1000 + mm*60*1000).toISOString(); // ~21:00 Rome ≈ 20:00 UTC
   return iso;
 }
 function msUntilISO(iso){
@@ -321,7 +323,7 @@ const bulkScores=document.getElementById('bulkScores');
 const applyBulkBtn=document.getElementById('applyBulkBtn');
 const summary=document.getElementById('summary');
 
-/* ====== State ====== */
+/* ====== Stato ====== */
 function setLockedUI(lockedUntilISO){
   [titleEl, contentEl, passEl, tagEl, unlockDateEl, unlockTimeEl, saveBtn].forEach(el=>el.disabled=true);
   editorLock.style.display='block';
@@ -401,95 +403,166 @@ function handleResetWeek(){
   viewMsg.innerHTML='<span class="success">Settimana azzerata. Puoi inserire una nuova schedina!</span>';
 }
 
-/* ====== Parser pronostici ======
-   Supporta:
-   - Teams: "Home - Away", "Home – Away", "Home — Away" (facoltativo)
-   - Esiti: 1, X, 2
-           1X, X2, 12
-           Over n(.5) / Under n(.5) (varianti O 2.5, U 2.5, U/O 2.5:O)
-           GG/BTTS/GOAL, NG/NO GOAL
+/* ====== Parser pronostici (con COMBO) ======
+   Supporta (singoli):
+   - 1X2: "1", "X", "2" oppure "1X2:1"
+   - Doppia chance: "1X", "X2", "12"
+   - Over/Under: "Over 2.5", "Under 3.5", "O 2.5", "U 2.5", "U/O 3.5:O"
+   - BTTS: "GG", "BTTS", "GOAL"  |  "NG", "NO GOAL"
+   COMBO: qualsiasi combinazione separata da " + ", "&", ",", " e "
+          es: "X2 + Under 3.5", "1 + U/O 3.5:O", "GG & Over 2.5"
 */
 const sepRegex = /\s*[-–—]\s*/;
+const comboSep = /\s*(?:\+|&|,|\be\b)\s*/i;
+
 function parseLine(raw){
   if(!raw) return null;
   const line = raw.trim().replace(/\s+/g,' ');
-  let home='', away='', marketPart=line;
-
-  // Prova a separare squadre
+  // estrai POTENZIALMENTE le squadre (parte non essenziale per la logica)
+  let home='', away='';
   if(sepRegex.test(line)){
     const [lhs, rhs] = line.split(sepRegex);
-    // ultimo token di rhs è probabile market (ma il market può essere con spazi)
-    // quindi, se in lhs/rhs ci sono parole chiave market, non forziamo. Meglio estrarre market con regex globale.
-    home = (lhs||'').trim();
-    // prova a separare market dal rhs con l'ultimo spazio SOLO se troviamo un pattern market
-    marketPart = rhs.trim();
-    away = ''; // la estraiamo meglio dopo
+    // Proviamo a capire squadre togliendo le parti di mercato
+    const cleanedL = removeMarkets(lhs);
+    const cleanedR = removeMarkets(rhs);
+    home = cleanedL.trim();
+    away = cleanedR.trim();
   }
 
-  // Trova market nel testo completo
-  const m = extractMarket(line);
-  if(!m) return {home, away, market:{type:'UNKNOWN', raw:line}, rawLine:raw};
-
-  // Se non abbiamo away/home, proviamo a ricavarli togliendo market dal testo
-  if(!home){
-    const parts = line.replace(m.matched,'').trim();
-    if(sepRegex.test(parts)){
-      const [h,a] = parts.split(sepRegex);
-      home=h?.trim()||''; away=a?.trim()||'';
-    }else{
-      home=''; away='';
-    }
-  } else {
-    // avevamo home; ora trova away togliendo market dalla parte destra
-    const rhsWithoutMarket = line.split(sepRegex)[1]?.replace(m.matched,'').trim();
-    away = rhsWithoutMarket || '';
+  // Estrai mercati (singolo o multipli)
+  const markets = extractMarkets(line);
+  if(markets.length===0){
+    return {home, away, market:{type:'UNKNOWN', raw:line}, rawLine:raw};
   }
-
-  return {home, away, market:m.market, rawLine:raw};
+  if(markets.length===1){
+    return {home, away, market:markets[0], rawLine:raw};
+  }
+  return {home, away, market:{type:'COMBO', picks:markets}, rawLine:raw};
 }
-function extractMarket(text){
-  const t = text.toUpperCase();
 
-  // 1) Doppia chance
-  const dc = t.match(/\b(1X|X2|12)\b/);
-  if(dc){ return {matched:dc[0], market:{type:'DC', pick:dc[0]}}; }
+// Rimuove match di mercati dal testo (utile per isolare nomi squadre)
+function removeMarkets(text){
+  let t = text;
+  // 1X2:val
+  t = t.replace(/\b1X2\s*:\s*([12X])\b/gi, ' ');
+  // DC
+  t = t.replace(/\b(1X|X2|12)\b/gi, ' ');
+  // 1/X/2 soli (parola singola)
+  t = t.replace(/\b([12X])\b/g, ' ');
+  // OU vari
+  t = t.replace(/\bU\/O\s*([0-9](?:\.[05])?)\s*:\s*(O|U)\b/gi, ' ');
+  t = t.replace(/\b([OU])\s*([0-9](?:\.[05])?)\b/gi, ' ');
+  t = t.replace(/\b(OVER|UNDER)\s*([0-9](?:\.[05])?)\b/gi, ' ');
+  // BTTS
+  t = t.replace(/\b(GG|BTTS|GOAL)\b/gi, ' ');
+  t = t.replace(/\b(NG|NO\s*GOAL)\b/gi, ' ');
+  // separatori combo
+  t = t.replace(comboSep, ' ');
+  return t;
+}
 
-  // 2) 1X2 secco
-  const onetwox = t.match(/\b([12X])\b/);
-  // ma non confondere con la DC già catturata; qui prende singolo
-  if(onetwox){ return {matched:onetwox[0], market:{type:'1X2', pick:onetwox[1]||onetwox[0]}}; }
+function extractMarkets(text){
+  // Spezza su potenziali separatori di combinazione ma NON è obbligatorio:
+  // cerchiamo tutti i mercati sul testo completo, poi de-duplico.
+  const parts = text.split(comboSep).map(s=>s.trim()).filter(Boolean);
 
-  // 3) Over/Under varie forme
-  // U/O 3.5:O  -> Over 3.5
-  const uoColon = t.match(/\bU\/O\s*([0-9](?:\.[05])?)\s*:\s*(O|U)\b/);
-  if(uoColon){
-    const thr=parseFloat(uoColon[1]); const pick = uoColon[2]==='O'?'OVER':'UNDER';
-    return {matched:uoColon[0], market:{type:'OU', pick, threshold:thr}};
+  const found = [];
+  const push = m => { if(m) found.push(m); };
+
+  for(const part of parts){
+    const m = extractSingleMarket(part);
+    if(m) push(m);
   }
-  // O 2.5 / U 2.5
-  const shortOU = t.match(/\b([OU])\s*([0-9](?:\.[05])?)\b/);
-  if(shortOU){
-    const thr=parseFloat(shortOU[2]); const pick = shortOU[1]==='O'?'OVER':'UNDER';
-    return {matched:shortOU[0], market:{type:'OU', pick, threshold:thr}};
-  }
-  // Over/Under classico
-  const longOU = t.match(/\b(OVER|UNDER)\s*([0-9](?:\.[05])?)\b/);
-  if(longOU){
-    const thr=parseFloat(longOU[2]); const pick = longOU[1];
-    return {matched:longOU[0], market:{type:'OU', pick, threshold:thr}};
+
+  // Se non ha separatori ma c'erano più mercati in un'unica stringa, prova anche a “scannerizzare” l'intera riga
+  if(found.length===0){
+    const multi = scanAllMarkets(text);
+    multi.forEach(push);
   }
 
-  // 4) GG/NG (BTTS)
-  const gg = t.match(/\b(GG|BTTS|GOAL)\b/);
-  if(gg){ return {matched:gg[0], market:{type:'BTTS', pick:'GG'}}; }
-  const ng = t.match(/\b(NG|NO\s*GOAL)\b/);
-  if(ng){ return {matched:ng[0], market:{type:'BTTS', pick:'NG'}}; }
+  // Deduplica casi come "GG" e "BTTS" assieme (equivalenti)
+  const key = m=>{
+    if(m.type==='OU') return `OU-${m.pick}-${m.threshold}`;
+    if(m.type==='1X2') return `1X2-${m.pick}`;
+    if(m.type==='DC')  return `DC-${m.pick}`;
+    if(m.type==='BTTS')return `BTTS-${m.pick}`;
+    return 'UNKNOWN';
+  };
+  const seen = new Set();
+  return found.filter(m=>{ const k=key(m); if(seen.has(k)) return false; seen.add(k); return true; });
+}
+
+function extractSingleMarket(t){
+  const T = t.toUpperCase();
+
+  // 1) 1X2 con valore esplicito: "1X2:1"
+  let m = T.match(/\b1X2\s*:\s*([12X])\b/);
+  if(m) return {type:'1X2', pick:m[1]};
+
+  // 2) DC
+  m = T.match(/\b(1X|X2|12)\b/);
+  if(m) return {type:'DC', pick:m[1]};
+
+  // 3) 1/X/2 singolo (evita di catturare se c'è anche DC nella stessa porzione)
+  // Se è presente una DC in 't', evitiamo 1X2 singolo per non duplicare.
+  if(!/\b(1X|X2|12)\b/.test(T)){
+    m = T.match(/\b([12X])\b/);
+    if(m) return {type:'1X2', pick:m[1]};
+  }
+
+  // 4) OU vari
+  m = T.match(/\bU\/O\s*([0-9](?:\.[05])?)\s*:\s*(O|U)\b/);
+  if(m){ const thr=parseFloat(m[1]); const pick=m[2]==='O'?'OVER':'UNDER'; return {type:'OU', pick, threshold:thr}; }
+
+  m = T.match(/\b([OU])\s*([0-9](?:\.[05])?)\b/);
+  if(m){ const thr=parseFloat(m[2]); const pick=m[1]==='O'?'OVER':'UNDER'; return {type:'OU', pick, threshold:thr}; }
+
+  m = T.match(/\b(OVER|UNDER)\s*([0-9](?:\.[05])?)\b/);
+  if(m){ const thr=parseFloat(m[2]); const pick=m[1]; return {type:'OU', pick, threshold:thr}; }
+
+  // 5) BTTS
+  m = T.match(/\b(GG|BTTS|GOAL)\b/);
+  if(m) return {type:'BTTS', pick:'GG'};
+  m = T.match(/\b(NG|NO\s*GOAL)\b/);
+  if(m) return {type:'BTTS', pick:'NG'};
 
   return null;
 }
 
+// Scanner globale se i separatori non ci sono ma i mercati sono concatenati
+function scanAllMarkets(text){
+  const T = text.toUpperCase();
+  const arr = [];
+
+  // ordine: DC -> 1X2:val -> OU -> BTTS -> 1X2 (singolo)
+  let m;
+  // DC (tutti)
+  const dcRe = /\b(1X|X2|12)\b/g; while((m=dcRe.exec(T))!==null){ arr.push({type:'DC', pick:m[1]}); }
+  // 1X2:val
+  const x2val = /\b1X2\s*:\s*([12X])\b/g; while((m=x2val.exec(T))!==null){ arr.push({type:'1X2', pick:m[1]}); }
+  // U/O thr:O|U
+  const uoColon = /\bU\/O\s*([0-9](?:\.[05])?)\s*:\s*(O|U)\b/g;
+  while((m=uoColon.exec(T))!==null){ arr.push({type:'OU', pick:(m[2]==='O'?'OVER':'UNDER'), threshold:parseFloat(m[1])}); }
+  // O thr / U thr
+  const shortOU = /\b([OU])\s*([0-9](?:\.[05])?)\b/g;
+  while((m=shortOU.exec(T))!==null){ arr.push({type:'OU', pick:(m[1]==='O'?'OVER':'UNDER'), threshold:parseFloat(m[2])}); }
+  // Over thr / Under thr
+  const longOU = /\b(OVER|UNDER)\s*([0-9](?:\.[05])?)\b/g;
+  while((m=longOU.exec(T))!==null){ arr.push({type:'OU', pick:m[1], threshold:parseFloat(m[2])}); }
+  // BTTS GG/NG
+  const ggRe = /\b(GG|BTTS|GOAL)\b/g; while((m=ggRe.exec(T))!==null){ arr.push({type:'BTTS', pick:'GG'}); }
+  const ngRe = /\b(NG|NO\s*GOAL)\b/g; while((m=ngRe.exec(T))!==null){ arr.push({type:'BTTS', pick:'NG'}); }
+  // 1X2 singolo (solo se non presente DC per evitare conflitti)
+  if(!/\b(1X|X2|12)\b/.test(T)){
+    const single = /\b([12X])\b/g;
+    while((m=single.exec(T))!==null){ arr.push({type:'1X2', pick:m[1]}); }
+  }
+  // deduplica dopo (lo fa extractMarkets)
+  return arr;
+}
+
 /* ====== Valutazione ====== */
-function evaluatePick(market, homeG, awayG){
+function evaluateSingle(market, homeG, awayG){
   const h = Number(homeG), a = Number(awayG);
   if(!Number.isFinite(h)||!Number.isFinite(a)||h<0||a<0) return {ok:false, reason:'score_invalid'};
   const tot = h+a;
@@ -517,6 +590,25 @@ function evaluatePick(market, homeG, awayG){
   }
 }
 
+function evaluateMarket(market, h, a){
+  if(market.type==='COMBO'){
+    // tutte devono essere ok
+    const results = market.picks.map(p=>evaluateSingle(p, h, a));
+    return { ok: results.every(r=>r.ok), details: results };
+  }
+  return evaluateSingle(market, h, a);
+}
+
+/* ====== UI helper ====== */
+function renderMarket(m){
+  if(m.type==='1X2') return `1X2: <span class="hl">${m.pick}</span>`;
+  if(m.type==='DC')  return `Doppia Chance: <span class="hl">${m.pick}</span>`;
+  if(m.type==='OU')  return `<span class="hl2">${m.pick}</span> ${m.threshold}`;
+  if(m.type==='BTTS')return (m.pick==='GG'?'Goal (entrambi segnano)':'NoGoal');
+  if(m.type==='COMBO')return m.picks.map(renderMarket).join(' <span class="small muted">+</span> ');
+  return `<span class="warnText">Pronostico non riconosciuto</span>`;
+}
+
 /* ====== Results UI build ====== */
 function makeLineRow(idx, item){
   const li=document.createElement('li');
@@ -541,14 +633,6 @@ function makeLineRow(idx, item){
 
   return {li, hIn, aIn, badge};
 }
-function renderMarket(m){
-  if(m.type==='1X2') return `1X2: <span class="hl">${m.pick}</span>`;
-  if(m.type==='DC') return `Doppia Chance: <span class="hl">${m.pick}</span>`;
-  if(m.type==='OU') return `<span class="hl2">${m.pick}</span> ${m.threshold}`;
-  if(m.type==='BTTS') return (m.pick==='GG'?'Goal':'NoGoal');
-  if(m.type==='UNKNOWN') return `<span class="warnText">Pronostico non riconosciuto</span>`;
-  return `<span class="warnText">Pronostico non riconosciuto</span>`;
-}
 
 /* ====== View flow ====== */
 async function handleView(){
@@ -572,7 +656,7 @@ async function handleView(){
 
     // Build list
     linesList.innerHTML='';
-    resultRows = []; // reset global
+    resultRows = []; // reset
     parsed.forEach((item, idx)=>{
       const {li, hIn, aIn, badge} = makeLineRow(idx, item||{market:{type:'UNKNOWN'}});
       linesList.appendChild(li);
@@ -601,6 +685,7 @@ let resultRows=[]; // {parsed, hIn, aIn, badge}
 function doEvaluate(){
   if(resultRows.length===0){ summary.textContent='Nessuna riga da valutare.'; return; }
   let wins=0, total=0, unknown=0;
+
   resultRows.forEach(row=>{
     total++;
     const item=row.parsed;
@@ -609,10 +694,11 @@ function doEvaluate(){
       row.badge.className='badge lose'; row.badge.textContent='?'; unknown++;
       return;
     }
-    const ex = evaluatePick(item.market, h, a);
+    const ex = evaluateMarket(item.market, h, a);
     if(ex.ok){ row.badge.className='badge win'; row.badge.textContent='OK'; wins++; }
     else { row.badge.className='badge lose'; row.badge.textContent='KO'; }
   });
+
   const allOk = (wins===total-unknown) && unknown===0 && total>0;
   summary.innerHTML = allOk
     ? `🏆 <b>Schedina VINCENTE</b> – ${wins}/${total} corretti`
@@ -642,12 +728,10 @@ function burst(){
 
 /* ====== Init ====== */
 function initDefaultsForUnlock(){
-  // Default suggerito: prossima Domenica 21:00
+  // Default: prossima Domenica 21:00
   const now=new Date();
   const pr=romeParts(now);
-  // base oggi
   const baseUTC=Date.UTC(pr.year, pr.month-1, pr.day, 0,0,0);
-  // Trova prossima domenica
   const wd = new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Rome',weekday:'short'}).format(new Date(baseUTC));
   const idx={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6}[wd];
   let add=(7-idx)%7; if(add===0) add=7;
