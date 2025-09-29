@@ -3,145 +3,101 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Schedina – Settimana in gioco</title>
+<title>Schedina – Sblocco personalizzato & Verifica</title>
 <style>
   :root{
     /* Pastelli giocosi */
-    --bg:#fffdf8;
-    --ink:#1f2230;
-    --muted:#60657a;
-    --card:#ffffff;
-    --line:#ece6ff;
-    --accent:#6c7bff;     /* lilla/indaco dolce */
-    --accent-2:#ff7db3;   /* rosa */
-    --accent-3:#7be3c5;   /* menta */
-    --accent-4:#ffd56c;   /* giallo crema */
-    --ok:#1e9e69;
-    --bad:#d9415f;
-    --warn:#b98400;
-
+    --bg:#fffdf8; --ink:#1f2230; --muted:#60657a; --card:#ffffff; --line:#ece6ff;
+    --accent:#6c7bff; --accent-2:#ff7db3; --accent-3:#7be3c5; --accent-4:#ffd56c;
+    --ok:#1e9e69; --bad:#d9415f; --warn:#b98400;
     --shadow: 0 10px 30px rgba(28,25,68,.08), 0 3px 10px rgba(28,25,68,.06);
-    --r:22px; /* rounded xl */
+    --r:22px;
   }
-
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
-    margin:0; color:var(--ink); background:
+    margin:0; color:var(--ink);
+    background:
       radial-gradient(1200px 600px at -10% -10%, #ffeef6 0%, transparent 65%),
       radial-gradient(1000px 600px at 110% -10%, #eef6ff 0%, transparent 60%),
       radial-gradient(800px 500px at 50% 120%, #eefff7 0%, transparent 55%),
       var(--bg);
-    font:16px/1.45 ui-rounded, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Inter, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-    padding:24px;
-    display:flex; align-items:center; justify-content:center;
+    font:16px/1.45 ui-rounded, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Inter, Arial;
+    padding:24px; display:flex; align-items:center; justify-content:center;
   }
-
-  .wrap{width:100%; max-width:1020px; display:grid; gap:18px}
+  .wrap{width:100%; max-width:1100px; display:grid; gap:18px}
   header{display:flex; align-items:center; justify-content:space-between; gap:12px}
-  h1{margin:0; font-size:26px; letter-spacing:.2px; display:flex; align-items:center; gap:10px}
+  h1{margin:0; font-size:26px; display:flex; align-items:center; gap:10px}
   h1 .logo{
-    width:38px; height:38px; border-radius:12px;
-    display:grid; place-items:center; font-size:20px;
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
-    color:#fff; box-shadow: var(--shadow);
+    width:38px; height:38px; border-radius:12px; display:grid; place-items:center; font-size:20px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2)); color:#fff; box-shadow: var(--shadow);
   }
   .pill{
-    background: #fff;
-    border:2px dashed var(--accent);
-    border-radius:999px; padding:8px 12px; font-weight:800; font-size:12px; color:var(--accent);
-    display:flex; align-items:center; gap:8px;
+    background:#fff; border:2px dashed var(--accent); border-radius:999px; padding:8px 12px;
+    font-weight:800; font-size:12px; color:var(--accent); display:flex; align-items:center; gap:8px;
   }
-
   .grid{display:grid; gap:18px}
-  @media(min-width:900px){ .grid{grid-template-columns:1.05fr .95fr} }
+  @media(min-width:950px){ .grid{grid-template-columns:1.05fr .95fr} }
 
   .card{
-    background: var(--card);
-    border: 2px solid var(--line);
-    border-radius: var(--r);
-    padding: 18px;
-    box-shadow: var(--shadow);
-    position:relative;
+    background:var(--card); border:2px solid var(--line); border-radius:var(--r); padding:18px; box-shadow:var(--shadow); position:relative;
   }
   .card h2{margin:0 0 8px 0; font-size:19px; display:flex; align-items:center; gap:8px}
-  .tag{
-    font-size:12px; font-weight:700; color:#fff;
-    background: linear-gradient(135deg, var(--accent-3), var(--accent-2));
-    border-radius:999px; padding:4px 10px;
-  }
-  .muted{color:var(--muted); font-size:13px}
-
-  label{display:block; font-size:13px; color:var(--muted); margin:10px 0 6px}
-  input[type="text"], input[type="password"], textarea{
-    width:100%; background:#fff; color:var(--ink);
-    border:2px solid var(--line); border-radius:14px; padding:12px 14px;
-    outline:none; transition:border-color .2s, box-shadow .2s; font-weight:600;
-  }
-  input:focus, textarea:focus{ border-color: var(--accent); box-shadow: 0 0 0 4px rgba(108,123,255,.12) }
-  textarea{min-height:150px; resize:vertical}
-
-  .row{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
-  .btn{
-    border:0; background:#1f2337; color:#fff; padding:12px 16px; border-radius:14px; cursor:pointer;
-    font-weight:800; letter-spacing:.2px; box-shadow: var(--shadow); transform: translateY(0);
-    transition: transform .06s ease, filter .2s ease, opacity .2s;
-  }
-  .btn:hover{filter:brightness(1.04)}
-  .btn:active{transform: translateY(1px)}
-  .btn.primary{background: linear-gradient(135deg, var(--accent), var(--accent-2))}
-  .btn.good{background: linear-gradient(135deg, var(--accent-3), #3ac49b)}
-  .btn.warn{background: linear-gradient(135deg, var(--accent-4), #ffae42); color:#3a2d00}
-  .btn.ghost{background:#fff; color:var(--ink); border:2px dashed var(--line)}
-  .btn:disabled{opacity:.6; cursor:not-allowed}
-
-  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:6px}
-  .chip{
-    padding:6px 10px; border-radius:999px; font-size:12px; font-weight:800; color:#2b2e3d; border:2px dashed var(--line);
-    background: #fff;
-  }
-  .chip.fixed{background: #fff8c8}
-  .chip.over{background: #ffe1f0}
-  .chip.alt{background: #dffcf3}
-
-  .callout{
-    border-radius:14px; background: #fff; border:2px dashed var(--line); padding:10px 12px;
-  }
-  .count{
-    font-variant-numeric: tabular-nums; font-weight:900; font-size:28px; letter-spacing:.5px;
-  }
-  .center{display:flex; align-items:center; justify-content:center}
-  .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
-  .success{color:var(--ok); font-weight:800}
-  .error{color:var(--bad); font-weight:800}
-
-  /* “Adesivi” giocosi */
   .sticker{
     position:absolute; right:-8px; top:-10px; transform:rotate(6deg);
     background:#fff; border:2px dashed var(--accent); color:var(--accent);
-    border-radius:12px; padding:6px 10px; font-size:12px; font-weight:900;
-    box-shadow: var(--shadow);
+    border-radius:12px; padding:6px 10px; font-size:12px; font-weight:900; box-shadow:var(--shadow);
   }
+  .muted{color:var(--muted); font-size:13px}
+  .tag{font-size:12px; font-weight:700; color:#fff; background:linear-gradient(135deg,var(--accent-3),var(--accent-2)); border-radius:999px; padding:4px 10px}
 
-  /* Lista risultato con pallini ciccioni */
+  label{display:block; font-size:13px; color:var(--muted); margin:10px 0 6px}
+  input[type="text"], input[type="password"], input[type="date"], input[type="time"], textarea{
+    width:100%; background:#fff; color:var(--ink);
+    border:2px solid var(--line); border-radius:14px; padding:12px 14px; outline:none; transition:border-color .2s, box-shadow .2s; font-weight:600;
+  }
+  input:focus, textarea:focus{ border-color:var(--accent); box-shadow:0 0 0 4px rgba(108,123,255,.12) }
+  textarea{min-height:150px; resize:vertical}
+  .row{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
+  .btn{
+    border:0; background:#1f2337; color:#fff; padding:12px 16px; border-radius:14px; cursor:pointer;
+    font-weight:800; letter-spacing:.2px; box-shadow:var(--shadow); transform:translateY(0);
+    transition:transform .06s ease, filter .2s ease, opacity .2s;
+  }
+  .btn:hover{filter:brightness(1.04)}
+  .btn:active{transform:translateY(1px)}
+  .btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent-2))}
+  .btn.good{background:linear-gradient(135deg,var(--accent-3),#3ac49b)}
+  .btn.warn{background:linear-gradient(135deg,var(--accent-4),#ffae42); color:#3a2d00}
+  .btn.ghost{background:#fff; color:var(--ink); border:2px dashed var(--line)}
+  .btn:disabled{opacity:.6; cursor:not-allowed}
+
+  .count{font-variant-numeric:tabular-nums; font-weight:900; font-size:28px; letter-spacing:.5px}
+  .success{color:var(--ok); font-weight:800}
+  .error{color:var(--bad); font-weight:800}
+  .warnText{color:var(--warn); font-weight:800}
+  .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
+
   .pretty-list{list-style:none; padding:0; margin:0}
   .pretty-list li{
     padding:8px 10px; margin:6px 0; background:#fff; border:2px solid var(--line); border-radius:12px; font-weight:700;
-    display:flex; align-items:center; gap:10px;
+    display:flex; align-items:center; gap:10px; justify-content:space-between;
   }
-  .pretty-dot{
-    width:12px; height:12px; border-radius:50%;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    box-shadow: 0 0 0 3px rgba(108,123,255,.18);
-  }
+  .left{display:flex; align-items:center; gap:10px}
+  .pretty-dot{width:12px; height:12px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent-2)); box-shadow:0 0 0 3px rgba(108,123,255,.18)}
+  .badge{padding:2px 8px; border-radius:999px; font-size:12px; font-weight:800; border:2px dashed var(--line)}
+  .badge.win{background:#eaffe9; color:#0b6a3f; border-color:#bdf1c6}
+  .badge.lose{background:#ffe9ef; color:#8a1031; border-color:#ffc0d0}
   .hl{background:#fff4b8; border-radius:6px; padding:1px 6px}
   .hl2{background:#ffd8ea; border-radius:6px; padding:1px 6px}
+  .small{font-size:12px}
+  .sep{height:1px; background:var(--line); margin:12px 0}
 </style>
 </head>
 <body>
   <div class="wrap">
     <header>
-      <h1><span class="logo">🎲</span> Schedina – <span style="font-weight:900; background:#fff; border-radius:10px; padding:2px 8px; border:2px dashed var(--line)">Settimana in gioco</span></h1>
+      <h1><span class="logo">🎲</span> Schedina – <span style="font-weight:900; background:#fff; border-radius:10px; padding:2px 8px; border:2px dashed var(--line)">Sblocco personalizzato</span></h1>
       <div class="pill" id="statePill">⚪ Stato: <b>Inizializzazione…</b></div>
     </header>
 
@@ -149,21 +105,13 @@
       <!-- EDITOR -->
       <section class="card" id="editorCard">
         <div class="sticker">✍️ Editor</div>
-        <h2>✍️ Inserisci la schedina</h2>
-        <p class="muted">
-          All’inizio è <b>sbloccato</b>. Quando salvi <span class="hl">si blocca fino a Domenica 21:00</span>.
-          I dati restano solo sul tuo browser, cifrati con la tua passphrase.
-        </p>
-        <div class="chips">
-          <span class="chip fixed">1X2</span>
-          <span class="chip over">Over/Under</span>
-          <span class="chip alt">Altro</span>
-        </div>
+        <h2>✍️ Inserisci la schedina <span class="tag">si blocca alla tua data/ora</span></h2>
+        <p class="muted">Quando premi <b>Salva & Blocca</b> scegli il <b>giorno/ora di sblocco</b>. Prima di quel momento non potrai vedere né modificare. Dati cifrati in locale.</p>
 
         <label for="title">Titolo/Etichetta</label>
-        <input id="title" type="text" placeholder="Schedina super color – Turno 34">
+        <input id="title" type="text" placeholder="Schedina Turno 34 – Super combo">
 
-        <label for="content">Contenuto (una riga per voce)</label>
+        <label for="content">Contenuto (una riga per voce). Esempi: <span class="small mono">“Milan – Lecce 1”</span>, <span class="small mono">“Bilbao–Girona Over 2.5”</span>, <span class="small mono">“Roma-Lazio GG”</span>, <span class="small mono">“Parma – Torino X2”</span>.</label>
         <textarea id="content" placeholder="Napoli – Pisa 1
 Frosinone – Cagliari X
 Udinese – Palermo 1
@@ -181,40 +129,51 @@ Ath. Bilbao – Girona Over 2.5"></textarea>
           </div>
         </div>
 
+        <div class="row">
+          <div style="width:180px">
+            <label for="unlockDate">Data sblocco</label>
+            <input id="unlockDate" type="date">
+          </div>
+          <div style="width:140px">
+            <label for="unlockTime">Ora sblocco</label>
+            <input id="unlockTime" type="time" step="60">
+          </div>
+          <div class="small muted">Zona oraria: <b>Europe/Rome</b></div>
+        </div>
+
         <div class="row" style="margin-top:12px">
-          <button class="btn primary" id="saveBtn">💾 Salva & Blocca fino a Domenica</button>
-          <button class="btn ghost" id="clearBtn" title="Rimuove tutto e sblocca se era bloccato">🗑️ Pulisci</button>
+          <button class="btn primary" id="saveBtn">💾 Salva & Blocca fino alla data scelta</button>
+          <button class="btn ghost" id="clearBtn" title="Rimuove tutto e sblocca">🗑️ Pulisci</button>
           <span id="saveMsg" class="muted"></span>
         </div>
 
-        <div id="editorLock" class="callout" style="margin-top:12px; display:none">
-          <b>Editor bloccato.</b> Hai già salvato una schedina. Tornerà modificabile <span class="mono" id="lockUntilText">Domenica 21:00</span>.
+        <div id="editorLock" class="muted" style="margin-top:12px; display:none">
+          <span class="warnText">Editor bloccato.</span> Torna modificabile <span class="mono" id="lockUntilText">—</span>.
         </div>
       </section>
 
-      <!-- VIEWER -->
+      <!-- VIEWER / VERIFICA -->
       <section class="card" id="viewerCard">
         <div class="sticker" style="right:auto; left:-8px; transform:rotate(-6deg)">🔒 Visualizza</div>
-        <h2>🔒 Visualizza schedina</h2>
+        <h2>🔒 Visualizza & Verifica esito</h2>
 
-        <div class="callout">
-          <div class="row" style="justify-content:space-between; align-items:flex-end">
-            <div>
-              <div class="muted">Stato sblocco</div>
-              <div id="unlockState" style="font-weight:900">verifica…</div>
-            </div>
-            <div class="center" style="gap:10px">
-              <div class="count" id="countdown">00:00:00:00</div>
-              <div class="muted" style="font-size:12px">gg : hh : mm : ss</div>
-            </div>
+        <div class="row" style="justify-content:space-between; align-items:flex-end">
+          <div>
+            <div class="muted">Stato sblocco</div>
+            <div id="unlockState" style="font-weight:900">verifica…</div>
+          </div>
+          <div class="row" style="gap:10px">
+            <div class="count" id="countdown">00:00:00:00</div>
+            <div class="muted small">gg : hh : mm : ss</div>
           </div>
         </div>
+        <div class="sep"></div>
 
-        <label for="viewPass">Passphrase (necessaria quando sbloccato)</label>
+        <label for="viewPass">Passphrase (necessaria dopo lo sblocco)</label>
         <input id="viewPass" type="password" placeholder="La stessa usata al salvataggio">
 
         <div class="row" style="margin-top:12px">
-          <button class="btn good" id="viewBtn">🔓 Mostra</button>
+          <button class="btn good" id="viewBtn">🔓 Mostra schedina</button>
           <button class="btn warn" id="resetWeekBtn" title="Dopo lo sblocco puoi ripartire pulito">🆕 Nuova settimana</button>
           <span id="viewMsg" class="muted"></span>
         </div>
@@ -224,88 +183,90 @@ Ath. Bilbao – Girona Over 2.5"></textarea>
             <div><span class="muted">Titolo:</span> <b id="resTitle">—</b></div>
             <div><span class="muted">Tag:</span> <b id="resTag">—</b></div>
           </div>
-          <div style="height:10px"></div>
-          <ul class="pretty-list" id="resList">
-            <li class="muted" style="font-weight:600">Nessun dato da mostrare.</li>
-          </ul>
+
+          <div class="sep"></div>
+
+          <!-- PANNELLO RISULTATI (si mostra dopo lo sblocco e la decifratura) -->
+          <div id="resultsPanel" style="display:none">
+            <p class="muted">Inserisci i risultati finali per ogni partita, poi premi <b>Valuta esito</b>. Puoi anche incollare i risultati in blocco (uno per riga, formati tipo <span class="mono">2-1</span>, <span class="mono">1:1</span>).</p>
+            <div class="row" style="align-items:flex-start">
+              <button class="btn good" id="evaluateBtn">✅ Valuta esito</button>
+              <div>
+                <label for="bulkScores" class="small">Incolla risultati in blocco</label>
+                <textarea id="bulkScores" placeholder="2-1
+1-1
+0-0" style="min-height:80px; width:260px"></textarea>
+              </div>
+              <button class="btn ghost" id="applyBulkBtn" title="Applica ai campi sotto nell'ordine">📥 Applica in ordine</button>
+            </div>
+
+            <ul class="pretty-list" id="linesList">
+              <li class="muted" style="font-weight:600">Nessun dato da mostrare.</li>
+            </ul>
+
+            <div class="sep"></div>
+            <div id="summary" class="muted">—</div>
+          </div>
         </div>
 
         <p class="muted" style="margin-top:10px">
-          Dati salvati localmente (<span class="mono">localStorage</span>) e cifrati (AES-GCM con PBKDF2).
+          Dati salvati localmente (<span class="mono">localStorage</span>) e cifrati (AES-GCM con PBKDF2). Zona oraria: Europe/Rome.
         </p>
       </section>
     </div>
   </div>
 
 <script>
-/* =========================
-   Utilità tempo (Europe/Rome)
-   ========================= */
+/* ====== Time helpers (Europe/Rome) ====== */
 function romeParts(date=new Date()){
   const p = new Intl.DateTimeFormat('en-GB',{
-    timeZone:'Europe/Rome',
-    weekday:'short', year:'numeric', month:'2-digit', day:'2-digit',
+    timeZone:'Europe/Rome', weekday:'short', year:'numeric', month:'2-digit', day:'2-digit',
     hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false
   }).formatToParts(date);
   const get=t=>p.find(x=>x.type===t)?.value;
-  return {
-    weekday:get('weekday'), year:+get('year'), month:+get('month'), day:+get('day'),
-    hour:+get('hour'), minute:+get('minute'), second:+get('second')
-  };
+  return {weekday:get('weekday'), year:+get('year'), month:+get('month'), day:+get('day'),
+          hour:+get('hour'), minute:+get('minute'), second:+get('second')};
 }
-function nextSundayAt21(){
-  const now = new Date();
-  const pr = romeParts(now);
-  // Costruisci "oggi 00:00 Rome" in UTC-safe
-  const baseUTC = Date.UTC(pr.year, pr.month-1, pr.day, 0,0,0);
-  const todayRome = new Date(baseUTC);
-  const wd = new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Rome', weekday:'short'}).format(todayRome);
-  const idx = {Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6}[wd];
-  let add = (7 - idx) % 7; // giorni fino a domenica
-  // Se oggi è domenica ma sono già oltre le 21:00 Rome, vai a domenica prossima
-  if (add===0){
-    if (pr.hour > 21 || (pr.hour===21 && (pr.minute>0 || pr.second>0))) add = 7;
+function romeISOFromDateTimeInputs(dateStr,timeStr){
+  // costruisce una data Europe/Rome con i campi date+time forniti, restituisce ISO
+  const nowP = romeParts(new Date());
+  const [y,m,d] = dateStr ? dateStr.split('-').map(n=>+n) : [nowP.year, nowP.month, nowP.day];
+  let hh=21, mm=0;
+  if(timeStr){
+    const [hS, mS] = timeStr.split(':');
+    hh = +hS; mm = +mS;
   }
-  // Target "domenica ore 21:00 Rome" -> convertiamo in UTC basandoci su parti Rome
-  // Stimiamo offset “grezzo” come pr.hour - now.getUTCHours(), ma preferiamo usare parti:
-  // Facciamo: partire da baseUTC (oggi 00:00 Rome) + add giorni + (21:00 - 1h) compensazione euristica
-  // (Mostrerà countdown corretto in base alla stessa euristica anche sotto DST.)
-  const targetUTC = Date.UTC(pr.year, pr.month-1, pr.day + add, 20, 0, 0); // 21:00 Rome ~ 20:00 UTC (approx)
-  return new Date(targetUTC);
+  // Approssimazione robusta: "Rome 00:00" come UTC base
+  const baseUTC = Date.UTC(y, m-1, d, 0, 0, 0);
+  // 21:00 Rome ≈ 20:00 UTC (l'euristica si mantiene coerente con i nostri calcoli)
+  const iso = new Date(baseUTC + (hh-1)*3600*1000 + mm*60*1000).toISOString();
+  return iso;
 }
-function msUntil(date){
+function msUntilISO(iso){
+  const tgt = new Date(iso);
   const pr = romeParts(new Date());
   const approxNowUTC = Date.UTC(pr.year, pr.month-1, pr.day, pr.hour-1, pr.minute, pr.second);
-  return date.getTime() - approxNowUTC;
+  return tgt.getTime() - approxNowUTC;
 }
 function fmtCountdown(ms){
-  if (ms<0) ms=0;
-  const s = Math.floor(ms/1000);
-  const d = Math.floor(s/86400);
-  const h = Math.floor((s%86400)/3600);
-  const m = Math.floor((s%3600)/60);
-  const sec = s%60;
-  const pad = n => String(n).padStart(2,'0');
-  return `${pad(d)}:${pad(h)}:${pad(m)}:${pad(sec)}`;
+  if(ms<0) ms=0;
+  const s=Math.floor(ms/1000), d=Math.floor(s/86400), h=Math.floor((s%86400)/3600), m=Math.floor((s%3600)/60), sec=s%60;
+  const pad=n=>String(n).padStart(2,'0'); return `${pad(d)}:${pad(h)}:${pad(m)}:${pad(sec)}`;
 }
 
-/* =========================
-   Storage
-   ========================= */
-const KEY_DATA='schedina.pkg';     // cifrato
-const KEY_META='schedina.meta';    // NON sensibile: { lockedUntilISO }
+/* ====== Storage ====== */
+const KEY_DATA='schedina.pkg';    // cifrato
+const KEY_META='schedina.meta';   // { lockedUntilISO }
 function saveMeta(meta){ localStorage.setItem(KEY_META, JSON.stringify(meta)); }
-function loadMeta(){ try{ return JSON.parse(localStorage.getItem(KEY_META) || 'null'); }catch{return null}}
+function loadMeta(){ try{return JSON.parse(localStorage.getItem(KEY_META)||'null')}catch{return null} }
 function clearAll(){ localStorage.removeItem(KEY_DATA); localStorage.removeItem(KEY_META); }
 function hasSaved(){ return !!localStorage.getItem(KEY_DATA); }
 
-/* =========================
-   Crypto: PBKDF2 + AES-GCM
-   ========================= */
+/* ====== Crypto (PBKDF2 + AES-GCM) ====== */
 function b64(buf){ return btoa(String.fromCharCode(...new Uint8Array(buf))); }
 function fromB64(b){ return Uint8Array.from(atob(b), c=>c.charCodeAt(0)); }
 async function deriveKey(pass, salt){
-  const enc = new TextEncoder();
+  const enc=new TextEncoder();
   const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(pass), {name:'PBKDF2'}, false, ['deriveKey']);
   return crypto.subtle.deriveKey(
     {name:'PBKDF2', salt, iterations:120000, hash:'SHA-256'},
@@ -313,250 +274,398 @@ async function deriveKey(pass, salt){
   );
 }
 async function encryptJSON(obj, pass){
-  const enc = new TextEncoder();
-  const iv = crypto.getRandomValues(new Uint8Array(12));
-  const salt = crypto.getRandomValues(new Uint8Array(16));
-  const key = await deriveKey(pass, salt);
-  const data = enc.encode(JSON.stringify(obj));
+  const enc=new TextEncoder();
+  const iv=crypto.getRandomValues(new Uint8Array(12));
+  const salt=crypto.getRandomValues(new Uint8Array(16));
+  const key=await deriveKey(pass, salt);
+  const data=enc.encode(JSON.stringify(obj));
   const ct = await crypto.subtle.encrypt({name:'AES-GCM', iv}, key, data);
   return {v:1, iv:b64(iv), salt:b64(salt), ct:b64(ct)};
 }
 async function decryptJSON(pkg, pass){
-  const iv = fromB64(pkg.iv), salt = fromB64(pkg.salt), ct = fromB64(pkg.ct);
-  const key = await deriveKey(pass, salt);
+  const iv=fromB64(pkg.iv), salt=fromB64(pkg.salt), ct=fromB64(pkg.ct);
+  const key=await deriveKey(pass, salt);
   const pt = await crypto.subtle.decrypt({name:'AES-GCM', iv}, key, ct);
   return JSON.parse(new TextDecoder().decode(pt));
 }
 
-/* =========================
-   UI refs
-   ========================= */
-const statePill = document.getElementById('statePill');
+/* ====== UI Refs ====== */
+const statePill=document.getElementById('statePill');
 
-const editorCard = document.getElementById('editorCard');
-const editorLock = document.getElementById('editorLock');
-const lockUntilText = document.getElementById('lockUntilText');
-const saveBtn = document.getElementById('saveBtn');
-const clearBtn = document.getElementById('clearBtn');
-const saveMsg = document.getElementById('saveMsg');
-const titleEl = document.getElementById('title');
-const contentEl = document.getElementById('content');
-const passEl = document.getElementById('pass');
-const tagEl = document.getElementById('tag');
+const editorCard=document.getElementById('editorCard');
+const editorLock=document.getElementById('editorLock');
+const lockUntilText=document.getElementById('lockUntilText');
+const saveBtn=document.getElementById('saveBtn');
+const clearBtn=document.getElementById('clearBtn');
+const saveMsg=document.getElementById('saveMsg');
+const titleEl=document.getElementById('title');
+const contentEl=document.getElementById('content');
+const passEl=document.getElementById('pass');
+const tagEl=document.getElementById('tag');
+const unlockDateEl=document.getElementById('unlockDate');
+const unlockTimeEl=document.getElementById('unlockTime');
 
-const unlockState = document.getElementById('unlockState');
-const countdownEl = document.getElementById('countdown');
-const viewPassEl = document.getElementById('viewPass');
-const viewBtn = document.getElementById('viewBtn');
-const resetWeekBtn = document.getElementById('resetWeekBtn');
-const viewMsg = document.getElementById('viewMsg');
-const resTitle = document.getElementById('resTitle');
-const resTag = document.getElementById('resTag');
-const resList = document.getElementById('resList');
+const unlockState=document.getElementById('unlockState');
+const countdownEl=document.getElementById('countdown');
+const viewPassEl=document.getElementById('viewPass');
+const viewBtn=document.getElementById('viewBtn');
+const resetWeekBtn=document.getElementById('resetWeekBtn');
+const viewMsg=document.getElementById('viewMsg');
 
-/* =========================
-   Stato dinamico
-   ========================= */
-let target = nextSundayAt21(); // default
-function setLockedUI(lockedUntil){
-  // Editor bloccato
-  [titleEl, contentEl, passEl, tagEl, saveBtn].forEach(el => el.disabled = true);
-  editorLock.style.display = 'block';
-  lockUntilText.textContent = new Intl.DateTimeFormat('it-IT', {
-    timeZone:'Europe/Rome', weekday:'long', hour:'2-digit', minute:'2-digit'
-  }).format(new Date(lockedUntil));
-  statePill.innerHTML = '🟣 Stato: <b>Bloccato</b>';
+const resTitle=document.getElementById('resTitle');
+const resTag=document.getElementById('resTag');
+const resultsPanel=document.getElementById('resultsPanel');
+const linesList=document.getElementById('linesList');
+const evaluateBtn=document.getElementById('evaluateBtn');
+const bulkScores=document.getElementById('bulkScores');
+const applyBulkBtn=document.getElementById('applyBulkBtn');
+const summary=document.getElementById('summary');
+
+/* ====== State ====== */
+function setLockedUI(lockedUntilISO){
+  [titleEl, contentEl, passEl, tagEl, unlockDateEl, unlockTimeEl, saveBtn].forEach(el=>el.disabled=true);
+  editorLock.style.display='block';
+  lockUntilText.textContent=new Intl.DateTimeFormat('it-IT',{timeZone:'Europe/Rome',weekday:'long',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).format(new Date(lockedUntilISO));
+  statePill.innerHTML='🟣 Stato: <b>Bloccato</b>';
 }
 function setUnlockedUI(){
-  [titleEl, contentEl, passEl, tagEl, saveBtn].forEach(el => el.disabled = false);
-  editorLock.style.display = 'none';
-  statePill.innerHTML = '🟢 Stato: <b>Sbloccato</b>';
+  [titleEl, contentEl, passEl, tagEl, unlockDateEl, unlockTimeEl, saveBtn].forEach(el=>el.disabled=false);
+  editorLock.style.display='none';
+  statePill.innerHTML='🟢 Stato: <b>Sbloccato</b>';
 }
-
 function refreshState(){
-  const meta = loadMeta();
-  if (!meta){
-    // Nessuna schedina: editor sbloccato, viewer “in attesa”
-    setUnlockedUI();
-    unlockState.innerHTML = '🟡 In attesa di salvataggio (libero)';
-    countdownEl.textContent = '00:00:00:00';
-    return;
-  }
-  // C'è una schedina: bloccato fino a Domenica
-  target = new Date(meta.lockedUntilISO);
+  const meta=loadMeta();
+  if(!meta){ setUnlockedUI(); unlockState.innerHTML='🟡 In attesa di salvataggio'; countdownEl.textContent='00:00:00:00'; return; }
   setLockedUI(meta.lockedUntilISO);
 }
 
+/* ====== Tick countdown ====== */
 function tick(){
-  const meta = loadMeta();
-  if (!meta){
-    requestAnimationFrame(()=>setTimeout(tick, 600));
-    return;
-  }
-  const remain = msUntil(new Date(meta.lockedUntilISO));
-  countdownEl.textContent = fmtCountdown(remain);
-  if (remain<=0){
-    unlockState.innerHTML = '<span class="success">✅ Sbloccato: puoi visualizzare</span>';
-  }else{
-    unlockState.innerHTML = '🔒 Ancora bloccato fino a Domenica 21:00';
-  }
-  requestAnimationFrame(()=>setTimeout(tick, 500));
+  const meta=loadMeta();
+  if(!meta){ requestAnimationFrame(()=>setTimeout(tick,600)); return; }
+  const remain=msUntilISO(meta.lockedUntilISO);
+  countdownEl.textContent=fmtCountdown(remain);
+  if(remain<=0){ unlockState.innerHTML='<span class="success">✅ Sbloccato: puoi visualizzare</span>'; }
+  else { unlockState.innerHTML='🔒 Ancora bloccato fino alla data impostata'; }
+  requestAnimationFrame(()=>setTimeout(tick,500));
 }
 
-/* =========================
-   Handlers
-   ========================= */
+/* ====== Save / Clear ====== */
 async function handleSave(){
-  saveMsg.textContent = '';
-  const title = (titleEl.value||'').trim();
-  const content = (contentEl.value||'').trim();
-  const pass = (passEl.value||'').trim();
-  const tag = (tagEl.value||'').trim();
+  saveMsg.textContent='';
+  const title=(titleEl.value||'').trim();
+  const content=(contentEl.value||'').trim();
+  const pass=(passEl.value||'').trim();
+  const tag=(tagEl.value||'').trim();
+  const dateStr=unlockDateEl.value;
+  const timeStr=unlockTimeEl.value || '21:00';
 
-  if (!title || !content || !pass){
-    saveMsg.innerHTML = '<span class="error">Compila titolo, contenuto e passphrase.</span>';
+  if(!title || !content || !pass || !dateStr){
+    saveMsg.innerHTML='<span class="error">Compila titolo, contenuto, passphrase e data di sblocco.</span>';
+    return;
+  }
+  const lockedUntilISO=romeISOFromDateTimeInputs(dateStr,timeStr);
+  if(msUntilISO(lockedUntilISO)<=0){
+    saveMsg.innerHTML='<span class="error">La data/ora di sblocco deve essere nel futuro.</span>';
     return;
   }
   try{
-    // Cifra e salva
-    const pkg = await encryptJSON({title, content, tag, savedAt:new Date().toISOString()}, pass);
+    const pkg=await encryptJSON({title, content, tag, savedAt:new Date().toISOString()}, pass);
     localStorage.setItem(KEY_DATA, JSON.stringify(pkg));
-
-    // Blocca fino a Domenica 21:00 calcolando nel momento del salvataggio
-    const lockedUntil = nextSundayAt21();
-    saveMeta({lockedUntilISO: lockedUntil.toISOString()});
-
-    // UI
-    setLockedUI(lockedUntil.toISOString());
-    saveMsg.innerHTML = '<span class="success">🎉 Salvato! Ora è bloccato fino a Domenica 21:00.</span>';
-
-    // mini-confettini (emoji)
+    saveMeta({lockedUntilISO});
+    setLockedUI(lockedUntilISO);
+    saveMsg.innerHTML='<span class="success">🎉 Salvato! Ora è bloccato fino alla tua data/ora.</span>';
     burst();
   }catch(e){
     console.error(e);
-    saveMsg.innerHTML = '<span class="error">Errore nel salvataggio.</span>';
+    saveMsg.innerHTML='<span class="error">Errore nel salvataggio.</span>';
   }
 }
-
 function handleClear(){
-  clearAll();
-  setUnlockedUI();
-  saveMsg.innerHTML = '<span class="success">Pulito tutto. Editor sbloccato.</span>';
-  // Pulisci viewer
+  clearAll(); setUnlockedUI();
+  saveMsg.innerHTML='<span class="success">Pulito tutto. Editor sbloccato.</span>';
   resTitle.textContent='—'; resTag.textContent='—';
-  resList.innerHTML='<li class="muted" style="font-weight:600">Nessun dato da mostrare.</li>';
-  unlockState.innerHTML='🟡 In attesa di salvataggio (libero)';
+  linesList.innerHTML='<li class="muted" style="font-weight:600">Nessun dato da mostrare.</li>';
+  resultsPanel.style.display='none';
+  summary.textContent='—';
+  unlockState.innerHTML='🟡 In attesa di salvataggio';
   countdownEl.textContent='00:00:00:00';
 }
-
 function handleResetWeek(){
-  // Consenti reset solo se ormai è sbloccato
-  const meta = loadMeta();
-  if (!meta){
-    viewMsg.innerHTML = '<span class="error">Non c’è nulla da resettare.</span>';
-    return;
-  }
-  const remain = msUntil(new Date(meta.lockedUntilISO));
-  if (remain>0){
-    viewMsg.innerHTML = '<span class="error">Puoi avviare una nuova settimana solo dopo Domenica 21:00.</span>';
-    return;
+  const meta=loadMeta();
+  if(!meta){ viewMsg.innerHTML='<span class="error">Non c’è nulla da resettare.</span>'; return; }
+  if(msUntilISO(meta.lockedUntilISO)>0){
+    viewMsg.innerHTML='<span class="error">Puoi azzerare solo dopo lo sblocco.</span>'; return;
   }
   handleClear();
-  viewMsg.innerHTML = '<span class="success">Settimana azzerata. Puoi inserire una nuova schedina!</span>';
+  viewMsg.innerHTML='<span class="success">Settimana azzerata. Puoi inserire una nuova schedina!</span>';
 }
 
-async function handleView(){
-  viewMsg.textContent = '';
-  const meta = loadMeta();
-  if (!meta){ viewMsg.innerHTML = '<span class="error">Nessuna schedina salvata.</span>'; return; }
+/* ====== Parser pronostici ======
+   Supporta:
+   - Teams: "Home - Away", "Home – Away", "Home — Away" (facoltativo)
+   - Esiti: 1, X, 2
+           1X, X2, 12
+           Over n(.5) / Under n(.5) (varianti O 2.5, U 2.5, U/O 2.5:O)
+           GG/BTTS/GOAL, NG/NO GOAL
+*/
+const sepRegex = /\s*[-–—]\s*/;
+function parseLine(raw){
+  if(!raw) return null;
+  const line = raw.trim().replace(/\s+/g,' ');
+  let home='', away='', marketPart=line;
 
-  const remain = msUntil(new Date(meta.lockedUntilISO));
-  if (remain>0){
-    viewMsg.innerHTML = '<span class="error">Disponibile solo dopo Domenica 21:00.</span>';
-    return;
+  // Prova a separare squadre
+  if(sepRegex.test(line)){
+    const [lhs, rhs] = line.split(sepRegex);
+    // ultimo token di rhs è probabile market (ma il market può essere con spazi)
+    // quindi, se in lhs/rhs ci sono parole chiave market, non forziamo. Meglio estrarre market con regex globale.
+    home = (lhs||'').trim();
+    // prova a separare market dal rhs con l'ultimo spazio SOLO se troviamo un pattern market
+    marketPart = rhs.trim();
+    away = ''; // la estraiamo meglio dopo
   }
-  const pkgStr = localStorage.getItem(KEY_DATA);
-  if (!pkgStr){ viewMsg.innerHTML = '<span class="error">Dati mancanti.</span>'; return; }
 
-  const pass = (viewPassEl.value||'').trim();
-  if (!pass){ viewMsg.innerHTML = '<span class="error">Inserisci la passphrase.</span>'; return; }
+  // Trova market nel testo completo
+  const m = extractMarket(line);
+  if(!m) return {home, away, market:{type:'UNKNOWN', raw:line}, rawLine:raw};
+
+  // Se non abbiamo away/home, proviamo a ricavarli togliendo market dal testo
+  if(!home){
+    const parts = line.replace(m.matched,'').trim();
+    if(sepRegex.test(parts)){
+      const [h,a] = parts.split(sepRegex);
+      home=h?.trim()||''; away=a?.trim()||'';
+    }else{
+      home=''; away='';
+    }
+  } else {
+    // avevamo home; ora trova away togliendo market dalla parte destra
+    const rhsWithoutMarket = line.split(sepRegex)[1]?.replace(m.matched,'').trim();
+    away = rhsWithoutMarket || '';
+  }
+
+  return {home, away, market:m.market, rawLine:raw};
+}
+function extractMarket(text){
+  const t = text.toUpperCase();
+
+  // 1) Doppia chance
+  const dc = t.match(/\b(1X|X2|12)\b/);
+  if(dc){ return {matched:dc[0], market:{type:'DC', pick:dc[0]}}; }
+
+  // 2) 1X2 secco
+  const onetwox = t.match(/\b([12X])\b/);
+  // ma non confondere con la DC già catturata; qui prende singolo
+  if(onetwox){ return {matched:onetwox[0], market:{type:'1X2', pick:onetwox[1]||onetwox[0]}}; }
+
+  // 3) Over/Under varie forme
+  // U/O 3.5:O  -> Over 3.5
+  const uoColon = t.match(/\bU\/O\s*([0-9](?:\.[05])?)\s*:\s*(O|U)\b/);
+  if(uoColon){
+    const thr=parseFloat(uoColon[1]); const pick = uoColon[2]==='O'?'OVER':'UNDER';
+    return {matched:uoColon[0], market:{type:'OU', pick, threshold:thr}};
+  }
+  // O 2.5 / U 2.5
+  const shortOU = t.match(/\b([OU])\s*([0-9](?:\.[05])?)\b/);
+  if(shortOU){
+    const thr=parseFloat(shortOU[2]); const pick = shortOU[1]==='O'?'OVER':'UNDER';
+    return {matched:shortOU[0], market:{type:'OU', pick, threshold:thr}};
+  }
+  // Over/Under classico
+  const longOU = t.match(/\b(OVER|UNDER)\s*([0-9](?:\.[05])?)\b/);
+  if(longOU){
+    const thr=parseFloat(longOU[2]); const pick = longOU[1];
+    return {matched:longOU[0], market:{type:'OU', pick, threshold:thr}};
+  }
+
+  // 4) GG/NG (BTTS)
+  const gg = t.match(/\b(GG|BTTS|GOAL)\b/);
+  if(gg){ return {matched:gg[0], market:{type:'BTTS', pick:'GG'}}; }
+  const ng = t.match(/\b(NG|NO\s*GOAL)\b/);
+  if(ng){ return {matched:ng[0], market:{type:'BTTS', pick:'NG'}}; }
+
+  return null;
+}
+
+/* ====== Valutazione ====== */
+function evaluatePick(market, homeG, awayG){
+  const h = Number(homeG), a = Number(awayG);
+  if(!Number.isFinite(h)||!Number.isFinite(a)||h<0||a<0) return {ok:false, reason:'score_invalid'};
+  const tot = h+a;
+
+  switch(market.type){
+    case '1X2': {
+      const res = h>a?'1':(h<a?'2':'X');
+      return {ok: res===market.pick};
+    }
+    case 'DC': {
+      const res = h>a?'1':(h<a?'2':'X');
+      return {ok: market.pick.includes(res)};
+    }
+    case 'OU': {
+      if(typeof market.threshold!=='number') return {ok:false, reason:'thr'};
+      if(market.pick==='OVER') return {ok: tot > market.threshold};
+      if(market.pick==='UNDER') return {ok: tot < market.threshold};
+      return {ok:false};
+    }
+    case 'BTTS': {
+      const both = (h>0 && a>0);
+      return {ok: market.pick==='GG' ? both : !both};
+    }
+    default: return {ok:false, reason:'unknown_market'};
+  }
+}
+
+/* ====== Results UI build ====== */
+function makeLineRow(idx, item){
+  const li=document.createElement('li');
+  const left=document.createElement('div'); left.className='left';
+  const dot=document.createElement('span'); dot.className='pretty-dot';
+  const label=document.createElement('div');
+  const teams = (item.home||item.away) ? `${item.home||'—'} vs ${item.away||'—'}` : 'Partita';
+  const marketTxt = renderMarket(item.market);
+  label.innerHTML = `<div><b>${teams}</b></div><div class="small muted">${marketTxt}</div>`;
+  left.appendChild(dot); left.appendChild(label);
+
+  const right=document.createElement('div');
+  // inputs punteggio
+  const hIn=document.createElement('input'); hIn.type='number'; hIn.min='0'; hIn.step='1'; hIn.placeholder='H'; hIn.style.width='64px';
+  const sep=document.createElement('span'); sep.className='mono muted'; sep.textContent=' - ';
+  const aIn=document.createElement('input'); aIn.type='number'; aIn.min='0'; aIn.step='1'; aIn.placeholder='A'; aIn.style.width='64px';
+  const badge=document.createElement('span'); badge.className='badge'; badge.textContent='?'; badge.style.marginLeft='8px';
+
+  right.appendChild(hIn); right.appendChild(sep); right.appendChild(aIn); right.appendChild(badge);
+
+  li.appendChild(left); li.appendChild(right);
+
+  return {li, hIn, aIn, badge};
+}
+function renderMarket(m){
+  if(m.type==='1X2') return `1X2: <span class="hl">${m.pick}</span>`;
+  if(m.type==='DC') return `Doppia Chance: <span class="hl">${m.pick}</span>`;
+  if(m.type==='OU') return `<span class="hl2">${m.pick}</span> ${m.threshold}`;
+  if(m.type==='BTTS') return (m.pick==='GG'?'Goal':'NoGoal');
+  if(m.type==='UNKNOWN') return `<span class="warnText">Pronostico non riconosciuto</span>`;
+  return `<span class="warnText">Pronostico non riconosciuto</span>`;
+}
+
+/* ====== View flow ====== */
+async function handleView(){
+  viewMsg.textContent='';
+  const meta=loadMeta();
+  if(!meta){ viewMsg.innerHTML='<span class="error">Nessuna schedina salvata.</span>'; return; }
+  if(msUntilISO(meta.lockedUntilISO)>0){ viewMsg.innerHTML='<span class="error">Disponibile solo dopo lo sblocco.</span>'; return; }
+  const pkgStr=localStorage.getItem(KEY_DATA);
+  if(!pkgStr){ viewMsg.innerHTML='<span class="error">Dati mancanti.</span>'; return; }
+  const pass=(viewPassEl.value||'').trim();
+  if(!pass){ viewMsg.innerHTML='<span class="error">Inserisci la passphrase.</span>'; return; }
 
   try{
-    const pkg = JSON.parse(pkgStr);
-    const data = await decryptJSON(pkg, pass);
+    const data = await decryptJSON(JSON.parse(pkgStr), pass);
+    // Header
+    resTitle.textContent=data.title||'—'; resTag.textContent=data.tag||'—';
 
-    // Output carino
-    resTitle.textContent = data.title || '—';
-    resTag.textContent = data.tag || '—';
-    const lines = (data.content||'').split('\n').map(s=>s.trim()).filter(Boolean);
+    // Parse lines
+    const lines=(data.content||'').split('\n').map(s=>s.trim()).filter(Boolean);
+    const parsed = lines.map(parseLine);
 
-    if (lines.length===0){
-      resList.innerHTML = '<li class="muted" style="font-weight:600">Contenuto vuoto.</li>';
-    } else {
-      resList.innerHTML = '';
-      for (const ln of lines){
-        const li = document.createElement('li');
-        const dot = document.createElement('span');
-        dot.className = 'pretty-dot';
-        const text = document.createElement('span');
+    // Build list
+    linesList.innerHTML='';
+    resultRows = []; // reset global
+    parsed.forEach((item, idx)=>{
+      const {li, hIn, aIn, badge} = makeLineRow(idx, item||{market:{type:'UNKNOWN'}});
+      linesList.appendChild(li);
+      resultRows.push({parsed:item, hIn, aIn, badge});
+    });
 
-        // Decorazioni 1X2/Over
-        let html = ln
-          .replace(/\b(1|X|2)\b/g, '<span class="hl">$1</span>')
-          .replace(/\b(Over\s*\d+(?:\.\d+)?)\b/ig, '<span class="hl2">$1</span>')
-          .replace(/\b(Under\s*\d+(?:\.\d+)?)\b/ig, '<span class="hl2">$1</span>');
-        text.innerHTML = html;
-
-        li.appendChild(dot);
-        li.appendChild(text);
-        resList.appendChild(li);
-      }
-    }
-    viewMsg.innerHTML = '<span class="success">Schedina mostrata ✔</span>';
+    resultsPanel.style.display='block';
+    viewMsg.innerHTML='<span class="success">Schedina caricata ✔</span>';
   }catch(e){
     console.error(e);
-    viewMsg.innerHTML = '<span class="error">Passphrase errata o dati corrotti.</span>';
+    viewMsg.innerHTML='<span class="error">Passphrase errata o dati corrotti.</span>';
   }
 }
 
-/* =========================
-   Piccola animazione “confetti”
-   ========================= */
+/* ====== Apply bulk scores ====== */
+function applyBulk(){
+  const rows = (bulkScores.value||'').split('\n').map(s=>s.trim()).filter(Boolean);
+  for(let i=0;i<rows.length && i<resultRows.length;i++){
+    const m = rows[i].match(/^(\d+)\s*[-:]\s*(\d+)$/);
+    if(m){ resultRows[i].hIn.value=m[1]; resultRows[i].aIn.value=m[2]; }
+  }
+}
+
+/* ====== Evaluate ====== */
+let resultRows=[]; // {parsed, hIn, aIn, badge}
+function doEvaluate(){
+  if(resultRows.length===0){ summary.textContent='Nessuna riga da valutare.'; return; }
+  let wins=0, total=0, unknown=0;
+  resultRows.forEach(row=>{
+    total++;
+    const item=row.parsed;
+    const h=row.hIn.value, a=row.aIn.value;
+    if(!item || !item.market || item.market.type==='UNKNOWN'){
+      row.badge.className='badge lose'; row.badge.textContent='?'; unknown++;
+      return;
+    }
+    const ex = evaluatePick(item.market, h, a);
+    if(ex.ok){ row.badge.className='badge win'; row.badge.textContent='OK'; wins++; }
+    else { row.badge.className='badge lose'; row.badge.textContent='KO'; }
+  });
+  const allOk = (wins===total-unknown) && unknown===0 && total>0;
+  summary.innerHTML = allOk
+    ? `🏆 <b>Schedina VINCENTE</b> – ${wins}/${total} corretti`
+    : `ℹ️ Esito: ${wins}/${total} corretti` + (unknown? ` (⚠️ ${unknown} non riconosciuti)`:'');
+}
+
+/* ====== Confetti ====== */
 function burst(){
-  const emojis = ['✨','🎉','💥','🎊','🌟'];
-  const n = 14;
-  for (let i=0;i<n;i++){
-    const s = document.createElement('div');
-    s.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+  const emojis=['✨','🎉','💥','🎊','🌟']; const n=14;
+  for(let i=0;i<n;i++){
+    const s=document.createElement('div');
+    s.textContent=emojis[Math.floor(Math.random()*emojis.length)];
     s.style.position='fixed';
-    s.style.left = (window.innerWidth/2 + (Math.random()-0.5)*240) + 'px';
-    s.style.top = (window.innerHeight/2 + (Math.random()-0.5)*80) + 'px';
-    s.style.fontSize = (18 + Math.random()*10) + 'px';
-    s.style.transform = `rotate(${(Math.random()*40-20)}deg)`;
-    s.style.opacity='1';
+    s.style.left=(window.innerWidth/2+(Math.random()-0.5)*240)+'px';
+    s.style.top=(window.innerHeight/2+(Math.random()-0.5)*80)+'px';
+    s.style.fontSize=(18+Math.random()*10)+'px';
+    s.style.transform=`rotate(${(Math.random()*40-20)}deg)`; s.style.opacity='1';
     s.style.transition='transform 700ms ease-out, opacity 700ms ease-out';
     document.body.appendChild(s);
     requestAnimationFrame(()=>{
       s.style.transform += ` translate(${(Math.random()-0.5)*160}px, ${60+Math.random()*120}px)`;
       s.style.opacity='0';
     });
-    setTimeout(()=>s.remove(), 800);
+    setTimeout(()=>s.remove(),800);
   }
 }
 
-/* =========================
-   Init
-   ========================= */
+/* ====== Init ====== */
+function initDefaultsForUnlock(){
+  // Default suggerito: prossima Domenica 21:00
+  const now=new Date();
+  const pr=romeParts(now);
+  // base oggi
+  const baseUTC=Date.UTC(pr.year, pr.month-1, pr.day, 0,0,0);
+  // Trova prossima domenica
+  const wd = new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Rome',weekday:'short'}).format(new Date(baseUTC));
+  const idx={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6}[wd];
+  let add=(7-idx)%7; if(add===0) add=7;
+  const nextYMD = new Date(baseUTC + add*24*3600*1000);
+  const y=nextYMD.getUTCFullYear(), m=String(nextYMD.getUTCMonth()+1).padStart(2,'0'), d=String(nextYMD.getUTCDate()).padStart(2,'0');
+  unlockDateEl.value = `${y}-${m}-${d}`;
+  unlockTimeEl.value = '21:00';
+}
 function init(){
-  refreshState();
-  tick();
+  refreshState(); tick();
   saveBtn.addEventListener('click', handleSave);
   clearBtn.addEventListener('click', handleClear);
   viewBtn.addEventListener('click', handleView);
   resetWeekBtn.addEventListener('click', handleResetWeek);
-
-  // Placeholder UI: se esiste pacchetto, cambia titolo pagina
-  if (hasSaved()){ document.title = 'Schedina – bloccata fino a Domenica'; }
+  evaluateBtn.addEventListener('click', doEvaluate);
+  applyBulkBtn.addEventListener('click', applyBulk);
+  initDefaultsForUnlock();
+  if(hasSaved()){ document.title='Schedina – bloccata fino allo sblocco'; }
 }
 init();
 </script>
